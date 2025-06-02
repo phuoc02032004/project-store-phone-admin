@@ -1,12 +1,168 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import type { Coupon as CouponType } from "@/types/Coupon";
+import { getCoupons, createCoupon, updateCoupon, deleteCoupon } from "@/api/coupon";
+import CouponForm from "@/components/coupon/CouponForm";
 
 const Coupon: React.FC = () => {
+    const [coupons, setCoupons] = useState<CouponType[]>([]);
+    const [selectedCoupon, setSelectedCoupon] = useState<CouponType | null>(null);
+    const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    useEffect(() => {
+        fetchCoupons();
+    }, []);
+
+    const fetchCoupons = async () => {
+        try {
+            const data = await getCoupons();
+            setCoupons(data);
+        } catch (error) {
+            console.error("Error fetching coupons:", error);
+        }
+    };
+
+    const handleAddCoupon = () => {
+        setSelectedCoupon(null);
+        setIsFormDialogOpen(true);
+    };
+
+    const handleEditCoupon = (coupon: CouponType) => {
+        setSelectedCoupon(coupon);
+        setIsFormDialogOpen(true);
+    };
+
+    const handleDeleteCoupon = (coupon: CouponType) => {
+        setSelectedCoupon(coupon);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const handleSaveCoupon = async (couponData: CouponType) => {
+        try {
+            if (selectedCoupon) {
+                await updateCoupon(selectedCoupon._id, couponData);
+            } else {
+                await createCoupon(couponData);
+            }
+            fetchCoupons();
+            setIsFormDialogOpen(false);
+        } catch (error) {
+            console.error("Error saving coupon:", error);
+        }
+    };
+
+    const handleConfirmDelete = async () => {
+        if (selectedCoupon) {
+            try {
+                await deleteCoupon(selectedCoupon._id);
+                fetchCoupons();
+                setIsDeleteDialogOpen(false);
+            } catch (error) {
+                console.error("Error deleting coupon:", error);
+            }
+        }
+    };
+
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Coupon Page</h1>
-            <p>This is the coupon page content.</p>
+            <h1 className="text-2xl font-bold mb-4">Coupon Management</h1>
+
+            <Button onClick={handleAddCoupon} className="mb-4">
+                Add New Coupon
+            </Button>
+
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Code</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Value</TableHead>
+                        <TableHead>Start Date</TableHead>
+                        <TableHead>End Date</TableHead>
+                        <TableHead>Active</TableHead>
+                        <TableHead>Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {coupons.map((coupon) => (
+                        <TableRow key={coupon._id}>
+                            <TableCell>{coupon.name}</TableCell>
+                            <TableCell>{coupon.code}</TableCell>
+                            <TableCell>{coupon.type}</TableCell>
+                            <TableCell>{coupon.value}</TableCell>
+                            <TableCell>{new Date(coupon.startDate).toLocaleDateString()}</TableCell>
+                            <TableCell>{new Date(coupon.endDate).toLocaleDateString()}</TableCell>
+                            <TableCell>{coupon.isActive ? "Yes" : "No"}</TableCell>
+                            <TableCell>
+                                <Button variant="outline" size="sm" onClick={() => handleEditCoupon(coupon)}>
+                                    Edit
+                                </Button>
+                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCoupon(coupon)}>
+                                    Delete
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+
+            {/* Coupon Form Dialog (Add/Edit) */}
+            <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>{selectedCoupon ? "Edit Coupon" : "Add New Coupon"}</DialogTitle>
+                        <DialogDescription>
+                            {selectedCoupon ? "Make changes to the coupon details here." : "Fill in the details for the new coupon."}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <CouponForm
+                        initialData={selectedCoupon}
+                        onSubmit={handleSaveCoupon}
+                        onCancel={() => setIsFormDialogOpen(false)}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Coupon Dialog */}
+            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                            This action cannot be undone. This will permanently delete the coupon.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={handleConfirmDelete}>
+                            Delete
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
-}
+};
 
 export default Coupon;

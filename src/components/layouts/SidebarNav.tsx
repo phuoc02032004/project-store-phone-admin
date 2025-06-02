@@ -14,6 +14,11 @@ import { useNavigate } from "react-router-dom";
 const SidebarNav: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+    window.location.reload();
+  }
   return (
     <Sidebar>
       <SidebarHeader>
@@ -88,7 +93,7 @@ const SidebarNav: React.FC = () => {
         </div>
       </SidebarContent>
       <SidebarFooter className="p-2">
-        <Button variant="outline" className="w-full justify-start text-white">
+        <Button variant="outline" className="w-full justify-start text-white" onClick={handleLogout}>
           Logout
         </Button>
       </SidebarFooter>
