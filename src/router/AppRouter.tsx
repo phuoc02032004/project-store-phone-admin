@@ -12,9 +12,8 @@ import User from "@/pages/User";
 import Settings from "@/pages/Settings";
 import Reviews from "@/pages/Reviews";
 
-const AppRouter: React.FC = () => {
+const AppRoutes: React.FC = () => {
   return (
-    <BrowserRouter>
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
@@ -29,8 +28,7 @@ const AppRouter: React.FC = () => {
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>
-    </BrowserRouter>
   );
 }
 
-export default AppRouter;
+export default AppRoutes;
