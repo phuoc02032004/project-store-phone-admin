@@ -10,6 +10,7 @@ import Order from "@/pages/Order";
 import Product from "@/pages/Product";
 import User from "@/pages/User";
 import Settings from "@/pages/Settings";
+import Reviews from "@/pages/Reviews";
 
 const AppRouter: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const AppRouter: React.FC = () => {
           <Route path="product" element={<Product />} />
           <Route path="user" element={<User />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="review" element={<Reviews />} />
         </Route>
         <Route path="/login" element={<Login />} />
       </Routes>

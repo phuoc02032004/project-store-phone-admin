@@ -15,11 +15,12 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Product as ProductType } from "@/types/Products";
 import { getProducts, addProduct, updateProduct, deleteProduct } from "@/api/product";
 import ProductForm from "@/components/product/ProductForm";
+import { toast } from "sonner"
+
 
 const Product: React.FC = () => {
     const [products, setProducts] = useState<ProductType[]>([]);
@@ -54,18 +55,19 @@ const Product: React.FC = () => {
         setSelectedProduct(product);
         setIsDeleteDialogOpen(true);
     };
-
-    const handleSaveProduct = async (productData: ProductType) => {
+    const handleSaveProduct = async (formData: FormData) => {
         try {
             if (selectedProduct) {
-                await updateProduct(selectedProduct._id, productData);
+                await updateProduct(selectedProduct._id, formData);
             } else {
-                await addProduct(productData);
+                await addProduct(formData);
             }
             fetchProducts();
             setIsFormDialogOpen(false);
+            toast(`${selectedProduct ? "Product updated successfully." : "Product added successfully."}`);
         } catch (error) {
             console.error("Error saving product:", error);
+            toast(`Failed to save product. ${error instanceof Error ? error.message : ''}`);
         }
     };
 
@@ -75,8 +77,10 @@ const Product: React.FC = () => {
                 await deleteProduct(selectedProduct._id);
                 fetchProducts();
                 setIsDeleteDialogOpen(false);
+                toast("Product deleted successfully.");
             } catch (error) {
                 console.error("Error deleting product:", error);
+                toast(`Failed to delete product. ${error instanceof Error ? error.message : ''}`);
             }
         }
     };
@@ -99,15 +103,15 @@ const Product: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {products.map((product) => (
+                    {products.slice().reverse().map((product) => (
                         <TableRow key={product._id}>
                             <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.decription}</TableCell>
+                            <TableCell>{product.description}</TableCell>
                             <TableCell>
                                 <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
                             </TableCell>
                             <TableCell>
-                                <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
+                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditProduct(product)}>
                                     Edit
                                 </Button>
                                 <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteProduct(product)}>
@@ -146,7 +150,7 @@ const Product: React.FC = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                        <Button variant="outline" className="text-white" onClick={() => setIsDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleConfirmDelete}>

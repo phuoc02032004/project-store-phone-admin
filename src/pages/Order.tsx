@@ -18,7 +18,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Order as OrderType } from "@/types/Order";
-import { getOrders, addOrder, updateOrder, deleteOrder } from "@/api/order";
+import { getOrders, updateOrderStatus, deleteOrder } from "@/api/order";
 import OrderForm from "@/components/order/OrderForm";
 
 const Order: React.FC = () => {
@@ -26,6 +26,7 @@ const Order: React.FC = () => {
     const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [isViewMode, setIsViewMode] = useState(false); // New state for view mode
 
     useEffect(() => {
         fetchOrders();
@@ -40,13 +41,9 @@ const Order: React.FC = () => {
         }
     };
 
-    const handleAddOrder = () => {
-        setSelectedOrder(null);
-        setIsFormDialogOpen(true);
-    };
-
-    const handleEditOrder = (order: OrderType) => {
+    const handleViewDetails = (order: OrderType) => {
         setSelectedOrder(order);
+        setIsViewMode(true); 
         setIsFormDialogOpen(true);
     };
 
@@ -55,17 +52,14 @@ const Order: React.FC = () => {
         setIsDeleteDialogOpen(true);
     };
 
-    const handleSaveOrder = async (orderData: OrderType) => {
+    const handleUpdateOrderStatus = async (id: string, status: string, payment: string) => {
         try {
-            if (selectedOrder) {
-                await updateOrder(selectedOrder._id, orderData);
-            } else {
-                await addOrder(orderData);
-            }
-            fetchOrders();
-            setIsFormDialogOpen(false);
+            await updateOrderStatus(id, status, payment);
+            console.log(id, status, payment);
+            fetchOrders(); 
+            setIsFormDialogOpen(false); 
         } catch (error) {
-            console.error("Error saving order:", error);
+            console.error("Error updating order status:", error);
         }
     };
 
@@ -85,9 +79,6 @@ const Order: React.FC = () => {
         <div className="p-4">
             <h1 className="text-2xl font-bold mb-4">Order Management</h1>
 
-            <Button onClick={handleAddOrder} className="mb-4">
-                Add New Order
-            </Button>
 
             <Table>
                 <TableHeader>
@@ -104,11 +95,11 @@ const Order: React.FC = () => {
                         <TableRow key={order._id}>
                             <TableCell>{order._id}</TableCell>
                             <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
-                            <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                            <TableCell>{order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</TableCell>
                             <TableCell>{order.orderStatus}</TableCell>
                             <TableCell>
-                                <Button variant="outline" size="sm" onClick={() => handleEditOrder(order)}>
-                                    Edit
+                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleViewDetails(order)}>
+                                    View Details
                                 </Button>
                                 <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteOrder(order)}>
                                     Delete
@@ -119,19 +110,23 @@ const Order: React.FC = () => {
                 </TableBody>
             </Table>
 
-            {/* Order Form Dialog (Add/Edit) */}
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>{selectedOrder ? "Edit Order" : "Add New Order"}</DialogTitle>
+                        <DialogTitle>Order Details</DialogTitle>
                         <DialogDescription>
-                            {selectedOrder ? "Make changes to the order details here." : "Fill in the details for the new order."}
+                            View the details of the selected order.
                         </DialogDescription>
                     </DialogHeader>
                     <OrderForm
-                        initialData={selectedOrder}
-                        onSubmit={handleSaveOrder}
-                        onCancel={() => setIsFormDialogOpen(false)}
+                        orderId={selectedOrder?._id || null}
+                        onSubmit={() => {}} 
+                        onCancel={() => {
+                            setIsFormDialogOpen(false);
+                            setIsViewMode(false); 
+                        }}
+                        isViewMode={isViewMode} 
+                        onUpdateStatus={handleUpdateOrderStatus} 
                     />
                 </DialogContent>
             </Dialog>

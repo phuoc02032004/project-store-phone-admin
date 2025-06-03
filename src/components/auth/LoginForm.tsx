@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { login } from "@/api/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -41,8 +40,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         try {
             await login(values.email, values.password);
             onLoginSuccess();
-        } catch (err) {
-            setError("Invalid email or password.");
+        } catch (err: any) {
+            if (err.message === "You do not have admin privileges.") {
+                setError(err.message);
+            } else {
+                setError("Invalid email or password.");
+            }
             console.error("Login error:", err);
         }
     };

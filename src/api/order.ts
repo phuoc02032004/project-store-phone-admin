@@ -1,5 +1,4 @@
 import axiosClient from "./axiosClient";
-import type { Product } from "@/types/Products";
 import type { Order } from "@/types/Order";
 
 const getOrders = async () => {
@@ -47,4 +46,22 @@ const deleteOrder = async (id: string) => {
     }
 };
 
-export { getOrders, getOrder, addOrder, updateOrder, deleteOrder };
+const updateOrderStatus = async (id: string, orderStatus: string, paymentMethod: string) => {
+    try {
+        const response = await axiosClient.patch<Order>(`/orders/${id}`, { orderStatus, paymentMethod });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getOrderById = async (id: string) => {
+    try {
+        const response = await axiosClient.get<Order>(`/orders/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export { getOrders, getOrder, addOrder, updateOrder, deleteOrder, updateOrderStatus, getOrderById };

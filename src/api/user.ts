@@ -37,4 +37,13 @@ const deleteUser = async (id: string) => {
     }
 }
 
-export { getUser, getUsers, updateUser, deleteUser }
+const promoteUserToAdmin = async (id: string) => {
+    try {
+        const response = await axiosClient.put(`/auth/promote/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export { getUser, getUsers, updateUser, deleteUser, promoteUserToAdmin };

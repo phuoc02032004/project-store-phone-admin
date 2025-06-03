@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { User as UserType } from "@/types/User";
-import { getUsers, updateUser, deleteUser } from "@/api/user";
+import { getUsers, promoteUserToAdmin, deleteUser } from "@/api/user";
 
 const User: React.FC = () => {
     const [users, setUsers] = useState<UserType[]>([]);
@@ -54,7 +54,7 @@ const User: React.FC = () => {
     const handleSaveEdit = async () => {
         if (selectedUser) {
             try {
-                await updateUser(selectedUser._id, selectedUser);
+                await promoteUserToAdmin(selectedUser._id);
                 fetchUsers();
                 setIsEditDialogOpen(false);
             } catch (error) {
@@ -72,12 +72,6 @@ const User: React.FC = () => {
             } catch (error) {
                 console.error("Error deleting user:", error);
             }
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (selectedUser) {
-            setSelectedUser({ ...selectedUser, [e.target.name]: e.target.value });
         }
     };
 
@@ -101,7 +95,7 @@ const User: React.FC = () => {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.role}</TableCell>
                             <TableCell>
-                                <Button variant="outline" size="sm" onClick={() => handleEdit(user)}>
+                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEdit(user)}>
                                     Edit
                                 </Button>
                                 <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDelete(user)}>
@@ -113,58 +107,26 @@ const User: React.FC = () => {
                 </TableBody>
             </Table>
 
-            {/* Edit User Dialog */}
+            {/* Edit User Dialog (Promote to Admin) */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>Edit User</DialogTitle>
+                        <DialogTitle>Promote User to Admin</DialogTitle>
                         <DialogDescription>
-                            Make changes to the user's profile here. Click save when you're done.
+                            Are you sure you want to promote this user to admin?
                         </DialogDescription>
                     </DialogHeader>
                     {selectedUser && (
                         <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="username" className="text-right">
-                                    Username
-                                </Label>
-                                <Input
-                                    id="username"
-                                    name="username"
-                                    value={selectedUser.username}
-                                    onChange={handleChange}
-                                    className="col-span-3"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="email" className="text-right">
-                                    Email
-                                </Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    value={selectedUser.email}
-                                    onChange={handleChange}
-                                    className="col-span-3"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="role" className="text-right">
-                                    Role
-                                </Label>
-                                <Input
-                                    id="role"
-                                    name="role"
-                                    value={selectedUser.role}
-                                    onChange={handleChange}
-                                    className="col-span-3"
-                                />
-                            </div>
+                            <p>Promoting user: <strong>{selectedUser.username}</strong></p>
                         </div>
                     )}
                     <DialogFooter>
+                        <Button variant="outline" className="text-white" onClick={() => setIsEditDialogOpen(false)}>
+                            Cancel
+                        </Button>
                         <Button type="submit" onClick={handleSaveEdit}>
-                            Save changes
+                            Confirm Promote
                         </Button>
                     </DialogFooter>
                 </DialogContent>

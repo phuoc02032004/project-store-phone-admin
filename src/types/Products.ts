@@ -4,8 +4,8 @@ import type { Review } from './Review';
 export interface Product {
     _id: string;
     name: string;
-    decription: string;
-    category: Category[];
+    description: string;
+    category: Category;
     image: string;
     isNewArrival: boolean;
     isBestSeller: boolean;
