@@ -12,7 +12,7 @@ const getCoupons = async () => {
 
 const getCoupon = async (id: string) => {
     try {
-        const response = await axiosClient.get<Coupon>(`/coupon/${id}`);
+        const response = await axiosClient.get<Coupon>(`/coupons/${id}`);
         return response.data;
     } catch (error) {
         throw error;
@@ -21,7 +21,7 @@ const getCoupon = async (id: string) => {
 
 const createCoupon = async (coupon: Coupon) => {
     try {
-        const response = await axiosClient.post<Coupon>("/coupon", coupon);
+        const response = await axiosClient.post<Coupon>("/coupons", coupon);
         return response.data;
     }
     catch (error) {
@@ -31,7 +31,7 @@ const createCoupon = async (coupon: Coupon) => {
 
 const updateCoupon = async (id: string, coupon: Partial<Coupon>) => {
     try {
-        const response = await axiosClient.put<Coupon>(`/coupon/${id}`, coupon);
+        const response = await axiosClient.put<Coupon>(`/coupons/${id}`, coupon);
         return response.data;
     } catch (error) {
         throw error;
@@ -40,7 +40,7 @@ const updateCoupon = async (id: string, coupon: Partial<Coupon>) => {
 
 const deleteCoupon = async (id: string) => {
     try {
-        const response = await axiosClient.delete(`/coupon/${id}`);
+        const response = await axiosClient.delete(`/coupons/${id}`);
         return response.data;
     } catch (error) {
         throw error;

@@ -20,6 +20,7 @@ import {
 import type { Coupon as CouponType } from "@/types/Coupon";
 import { getCoupons, createCoupon, updateCoupon, deleteCoupon } from "@/api/coupon";
 import CouponForm from "@/components/coupon/CouponForm";
+import { toast } from "sonner";
 
 const Coupon: React.FC = () => {
     const [coupons, setCoupons] = useState<CouponType[]>([]);
@@ -43,24 +44,28 @@ const Coupon: React.FC = () => {
     const handleAddCoupon = () => {
         setSelectedCoupon(null);
         setIsFormDialogOpen(true);
+        toast("Ready to add a new coupon!");
     };
 
     const handleEditCoupon = (coupon: CouponType) => {
         setSelectedCoupon(coupon);
         setIsFormDialogOpen(true);
+        toast("Ready to edit the coupon!");
     };
 
     const handleDeleteCoupon = (coupon: CouponType) => {
         setSelectedCoupon(coupon);
         setIsDeleteDialogOpen(true);
+        toast("Ready to delete the coupon!");
     };
 
-    const handleSaveCoupon = async (couponData: CouponType) => {
+    const handleSaveCoupon = async (couponData: Partial<CouponType>) => {
         try {
             if (selectedCoupon) {
                 await updateCoupon(selectedCoupon._id, couponData);
+                toast.success("Coupon updated successfully!");
             } else {
-                await createCoupon(couponData);
+                await createCoupon(couponData as CouponType);
             }
             fetchCoupons();
             setIsFormDialogOpen(false);
@@ -75,6 +80,7 @@ const Coupon: React.FC = () => {
                 await deleteCoupon(selectedCoupon._id);
                 fetchCoupons();
                 setIsDeleteDialogOpen(false);
+                toast.success("Coupon deleted successfully!");
             } catch (error) {
                 console.error("Error deleting coupon:", error);
             }
@@ -103,7 +109,7 @@ const Coupon: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {coupons.map((coupon) => (
+                    {coupons.slice().reverse().map((coupon) => (
                         <TableRow key={coupon._id}>
                             <TableCell>{coupon.name}</TableCell>
                             <TableCell>{coupon.code}</TableCell>
@@ -113,7 +119,7 @@ const Coupon: React.FC = () => {
                             <TableCell>{new Date(coupon.endDate).toLocaleDateString()}</TableCell>
                             <TableCell>{coupon.isActive ? "Yes" : "No"}</TableCell>
                             <TableCell>
-                                <Button variant="outline" size="sm" onClick={() => handleEditCoupon(coupon)}>
+                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditCoupon(coupon)}>
                                     Edit
                                 </Button>
                                 <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCoupon(coupon)}>
@@ -127,7 +133,7 @@ const Coupon: React.FC = () => {
 
             {/* Coupon Form Dialog (Add/Edit) */}
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-3xl">
                     <DialogHeader>
                         <DialogTitle>{selectedCoupon ? "Edit Coupon" : "Add New Coupon"}</DialogTitle>
                         <DialogDescription>
@@ -152,7 +158,7 @@ const Coupon: React.FC = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                        <Button variant="outline" className="text-white" onClick={() => setIsDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleConfirmDelete}>

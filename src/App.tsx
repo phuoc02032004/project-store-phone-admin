@@ -6,10 +6,10 @@ import { Toaster } from "@/components/ui/sonner"
 const App: React.FC = () => {
 
   return (
-    <>
-      <AppRouter />
+    <div className='bg-[linear-gradient(to_right,#522157,#53A6D8)]'>
+      <AppRouter/>
       <Toaster richColors position="top-right" />
-    </>
+    </div>
   )
 }
 

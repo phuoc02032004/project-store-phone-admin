@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,44 +12,61 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox"; // Import Checkbox
+import { Label } from "@/components/ui/label"; // Import Label
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import type { Category } from "@/types/Category";
+import { getCategories } from "@/api/category";
+import { toast } from "sonner";
 
 interface CategoryFormProps {
     initialData?: Category | null;
-    onSubmit: (data: Category) => void;
+    onSubmit: (data: z.infer<typeof formSchema>) => void; 
     onCancel: () => void;
 }
 
 const formSchema = z.object({
     name: z.string().min(1, { message: "Category name is required." }),
-    slug: z.string().min(1, { message: "Category slug is required." }),
     description: z.string().optional(),
-    image: z.string().url({ message: "Invalid image URL." }).optional(),
-    // For parent and ancestors, we might need more complex handling (e.g., a select dropdown for parent categories)
-    // For simplicity, we'll omit them from the form for now or treat them as optional strings.
-    // parent: z.string().optional(),
-    // ancestors: z.array(z.string()).optional(),
+    parentId: z.string().optional(), 
+    image: z.instanceof(File).optional(),
 });
 
 const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSubmit, onCancel }) => {
+    const [categories, setCategories] = useState<Category[]>([]);
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: initialData || {
-            name: "",
-            slug: "",
-            description: "",
-            image: "",
+        defaultValues: {
+            name: initialData?.name || "",
+            description: initialData?.description || "",
+            parentId: initialData?.parent ? initialData.parent._id : "",
+            image: undefined, 
         },
     });
 
     useEffect(() => {
-        if (initialData) {
-            form.reset(initialData);
-        }
-    }, [initialData, form]);
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories();
+                const filteredCategories = initialData ? data.filter(cat => cat._id !== initialData._id) : data;
+                setCategories(filteredCategories);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+                toast("Failed to load categories.");
+            }
+        };
+        fetchCategories();
+    }, [initialData]);
 
     const handleSubmit = (values: z.infer<typeof formSchema>) => {
-        onSubmit(values as Category); // Cast to Category, assuming formSchema covers all required fields
+        onSubmit(values);
     };
 
     return (
@@ -70,19 +87,6 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSubmit, onCa
                 />
                 <FormField
                     control={form.control}
-                    name="slug"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Slug</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter category slug" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
                     name="description"
                     render={({ field }) => (
                         <FormItem>
@@ -96,19 +100,48 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSubmit, onCa
                 />
                 <FormField
                     control={form.control}
-                    name="image"
+                    name="parentId"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Image URL (Optional)</FormLabel>
+                            <FormLabel>Parent Category (Optional)</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a parent category" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {categories.filter(cat => cat.parent === null).map((category) => (
+                                        <SelectItem key={category._id} value={category._id}>
+                                            {category.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="image"
+                    render={({ field: { value, onChange, ...fieldProps } }) => (
+                        <FormItem>
+                            <FormLabel>Category image</FormLabel> 
                             <FormControl>
-                                <Input placeholder="Enter image URL" {...field} />
-                            </FormControl>
+                                <Input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => onChange(e.target.files ? e.target.files[0] : undefined)}
+                                    {...fieldProps}
+                                />
+                            </FormControl>                          
                             <FormMessage />
                         </FormItem>
                     )}
                 />
                 <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={onCancel}>
+                    <Button type="button" className="text-white" variant="outline" onClick={onCancel}>
                         Cancel
                     </Button>
                     <Button type="submit">

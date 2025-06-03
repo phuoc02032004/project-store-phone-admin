@@ -16,6 +16,15 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import type { Product as ProductType } from "@/types/Products";
 import { getProducts, addProduct, updateProduct, deleteProduct } from "@/api/product";
 import ProductForm from "@/components/product/ProductForm";
@@ -27,6 +36,8 @@ const Product: React.FC = () => {
     const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
 
     useEffect(() => {
         fetchProducts();
@@ -44,6 +55,7 @@ const Product: React.FC = () => {
     const handleAddProduct = () => {
         setSelectedProduct(null);
         setIsFormDialogOpen(true);
+        toast("Ready to add a new product!");
     };
 
     const handleEditProduct = (product: ProductType) => {
@@ -54,7 +66,9 @@ const Product: React.FC = () => {
     const handleDeleteProduct = (product: ProductType) => {
         setSelectedProduct(product);
         setIsDeleteDialogOpen(true);
+        toast.error("Are you sure you want to delete this product?");
     };
+
     const handleSaveProduct = async (formData: FormData) => {
         try {
             if (selectedProduct) {
@@ -85,15 +99,59 @@ const Product: React.FC = () => {
         }
     };
 
+    const totalPages = Math.ceil(products.length / itemsPerPage);
+    const pageRange = 2; // Number of pages to show around the current page
+
+    const renderPaginationItems = () => {
+        const items = [];
+        const startPage = Math.max(1, currentPage - pageRange);
+        const endPage = Math.min(totalPages, currentPage + pageRange);
+
+        if (startPage > 1) {
+            items.push(
+                <PaginationItem key={1}>
+                    <PaginationLink href="#" onClick={() => setCurrentPage(1)} className="text-white">1</PaginationLink>
+                </PaginationItem>
+            );
+            if (startPage > 2) {
+                items.push(<PaginationEllipsis key="ellipsis-start" className="text-black" />);
+            }
+        }
+
+        for (let page = startPage; page <= endPage; page++) {
+            items.push(
+                <PaginationItem key={page}>
+                    <PaginationLink href="#" isActive={page === currentPage} onClick={() => setCurrentPage(page)} className="text-black">
+                        {page}
+                    </PaginationLink>
+                </PaginationItem>
+            );
+        }
+
+        // Last page
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                items.push(<PaginationEllipsis key="ellipsis-end" className="text-black" />);
+            }
+            items.push(
+                <PaginationItem key={totalPages}>
+                    <PaginationLink href="#" onClick={() => setCurrentPage(totalPages)} className="text-black">{totalPages}</PaginationLink>
+                </PaginationItem>
+            );
+        }
+
+        return items;
+    };
+
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Product Management</h1>
+            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Product Management</h1>
 
             <Button onClick={handleAddProduct} className="mb-4">
                 Add New Product
             </Button>
 
-            <Table>
+            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Name</TableHead>
@@ -103,7 +161,7 @@ const Product: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {products.slice().reverse().map((product) => (
+                    {products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).reverse().map((product) => (
                         <TableRow key={product._id}>
                             <TableCell>{product.name}</TableCell>
                             <TableCell>{product.description}</TableCell>
@@ -123,7 +181,18 @@ const Product: React.FC = () => {
                 </TableBody>
             </Table>
 
-            {/* Product Form Dialog (Add/Edit) */}
+            <Pagination className="mt-4  bg-transparent">
+                <PaginationContent>
+                    <PaginationItem>
+                        <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} className="" />
+                    </PaginationItem>
+                    {renderPaginationItems()}
+                    <PaginationItem>
+                        <PaginationNext href="#" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} />
+                    </PaginationItem>
+                </PaginationContent>
+            </Pagination>
+
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -140,7 +209,6 @@ const Product: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Product Dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent>
                     <DialogHeader>

@@ -55,7 +55,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({ initialData, onSubm
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="grid grid-cols-4 gap-4">
                 <FormField
                     control={form.control}
                     name="title"
@@ -121,7 +121,7 @@ const NotificationForm: React.FC<NotificationFormProps> = ({ initialData, onSubm
                         </FormItem>
                     )}
                 />
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2 col-span-4">
                     <Button type="button" variant="outline" onClick={onCancel}>
                         Cancel
                     </Button>

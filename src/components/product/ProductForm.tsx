@@ -21,7 +21,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Product, Variant } from "@/types/Products";
+import type { Product } from "@/types/Products";
 import type { Category } from "@/types/Category";
 import { getCategories } from "@/api/category";
 import { toast } from "sonner"
@@ -77,7 +77,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, onCanc
                 ...initialData,
                 category: initialData.category?._id || "",
                 variants: JSON.stringify(initialData.variants, null, 2),
-                image: undefined, // Do not pre-fill file input
+                image: undefined, 
             });
             console.log("Initial category value:", initialData.image);
  
@@ -132,7 +132,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, onCanc
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        {categories.map((category) => (
+                                        {categories.filter(cat => cat.parent !== null).map((category) => (
                                             <SelectItem key={category._id} value={category._id}>
                                                 {category.name} 
                                             </SelectItem>

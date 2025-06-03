@@ -7,7 +7,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { HomeIcon, SettingsIcon } from "lucide-react";
+import { HomeIcon, SettingsIcon, UsersIcon, PackageIcon, ShoppingCartIcon, TagIcon, BellIcon, GiftIcon, DoorClosed  } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const SidebarNav: React.FC = () => {
@@ -20,8 +20,8 @@ const SidebarNav: React.FC = () => {
   };
 
   return (
-    <Sidebar className="bg-black text-white min-h-screen">
-      <SidebarHeader className="p-4 border-b border-white/10">
+    <Sidebar className=" text-white min-h-screen backdrop-blur-3xl shadow-2xl">
+      <SidebarHeader className="p-4">
         <Link to="/" className="flex items-center gap-2">
           <HomeIcon className="size-5 text-white" />
           <span className="text-lg font-semibold">Admin Dashboard</span>
@@ -35,6 +35,7 @@ const SidebarNav: React.FC = () => {
             className="justify-start text-white hover:bg-white/10"
             onClick={() => navigate("/user")}
           >
+            <UsersIcon className="mr-2 size-4" />
             Users
           </Button>
           <Button
@@ -42,6 +43,7 @@ const SidebarNav: React.FC = () => {
             className="justify-start text-white hover:bg-white/10"
             onClick={() => navigate("/product")}
           >
+            <PackageIcon className="mr-2 size-4" />
             Products
           </Button>
           <Button
@@ -49,6 +51,7 @@ const SidebarNav: React.FC = () => {
             className="justify-start text-white hover:bg-white/10"
             onClick={() => navigate("/order")}
           >
+            <ShoppingCartIcon className="mr-2 size-4" />
             Orders
           </Button>
           <Button
@@ -56,6 +59,7 @@ const SidebarNav: React.FC = () => {
             className="justify-start text-white hover:bg-white/10"
             onClick={() => navigate("/category")}
           >
+            <TagIcon className="mr-2 size-4" />
             Categories
           </Button>
           <Button
@@ -63,6 +67,7 @@ const SidebarNav: React.FC = () => {
             className="justify-start text-white hover:bg-white/10"
             onClick={() => navigate("/notification")}
           >
+            <BellIcon className="mr-2 size-4" />
             Notifications
           </Button>
           <Button
@@ -70,6 +75,7 @@ const SidebarNav: React.FC = () => {
             className="justify-start text-white hover:bg-white/10"
             onClick={() => navigate("/coupon")}
           >
+            <GiftIcon className="mr-2 size-4" />
             Coupons
           </Button>
         </div>
@@ -94,6 +100,7 @@ const SidebarNav: React.FC = () => {
           className="w-full justify-start text-white hover:bg-white/10"
           onClick={handleLogout}
         >
+          <DoorClosed className="mr-2 size-4" />
           Logout
         </Button>
       </SidebarFooter>

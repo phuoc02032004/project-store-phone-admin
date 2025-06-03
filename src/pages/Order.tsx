@@ -17,16 +17,30 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import type { Order as OrderType } from "@/types/Order";
 import { getOrders, updateOrderStatus, deleteOrder } from "@/api/order";
 import OrderForm from "@/components/order/OrderForm";
+import { toast } from "sonner"
 
 const Order: React.FC = () => {
     const [orders, setOrders] = useState<OrderType[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [isViewMode, setIsViewMode] = useState(false); // New state for view mode
+    const [isViewMode, setIsViewMode] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+    
+    
 
     useEffect(() => {
         fetchOrders();
@@ -45,11 +59,13 @@ const Order: React.FC = () => {
         setSelectedOrder(order);
         setIsViewMode(true); 
         setIsFormDialogOpen(true);
+        toast.success("Order details loaded successfully!");
     };
 
     const handleDeleteOrder = (order: OrderType) => {
         setSelectedOrder(order);
         setIsDeleteDialogOpen(true);
+        toast.error("Are you sure you want to delete this order?");
     };
 
     const handleUpdateOrderStatus = async (id: string, status: string, payment: string) => {
@@ -58,6 +74,7 @@ const Order: React.FC = () => {
             console.log(id, status, payment);
             fetchOrders(); 
             setIsFormDialogOpen(false); 
+            toast.success("Order status updated successfully!");
         } catch (error) {
             console.error("Error updating order status:", error);
         }
@@ -69,18 +86,61 @@ const Order: React.FC = () => {
                 await deleteOrder(selectedOrder._id);
                 fetchOrders();
                 setIsDeleteDialogOpen(false);
+                toast.success("Order deleted successfully!");
             } catch (error) {
                 console.error("Error deleting order:", error);
             }
         }
     };
 
+    const totalPages = Math.ceil(orders.length / itemsPerPage);
+        const pageRange = 2; // Number of pages to show around the current page
+    
+        const renderPaginationItems = () => {
+            const items = [];
+            const startPage = Math.max(1, currentPage - pageRange);
+            const endPage = Math.min(totalPages, currentPage + pageRange);
+    
+            if (startPage > 1) {
+                items.push(
+                    <PaginationItem key={1}>
+                        <PaginationLink href="#" onClick={() => setCurrentPage(1)} className="text-black">1</PaginationLink>
+                    </PaginationItem>
+                );
+                if (startPage > 2) {
+                    items.push(<PaginationEllipsis key="ellipsis-start" className="text-black" />);
+                }
+            }
+    
+            for (let page = startPage; page <= endPage; page++) {
+                items.push(
+                    <PaginationItem key={page}>
+                        <PaginationLink href="#" isActive={page === currentPage} onClick={() => setCurrentPage(page)} className="text-black">
+                            {page}
+                        </PaginationLink>
+                    </PaginationItem>
+                );
+            }
+    
+            // Last page
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    items.push(<PaginationEllipsis key="ellipsis-end" className="text-black" />);
+                }
+                items.push(
+                    <PaginationItem key={totalPages}>
+                        <PaginationLink href="#" onClick={() => setCurrentPage(totalPages)} className="text-black">{totalPages}</PaginationLink>
+                    </PaginationItem>
+                );
+            }
+    
+            return items;
+        };
+
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Order Management</h1>
-
-
-            <Table>
+            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Order Management</h1>
+            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Order ID</TableHead>
@@ -91,7 +151,7 @@ const Order: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {orders.map((order) => (
+                    {orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
                         <TableRow key={order._id}>
                             <TableCell>{order._id}</TableCell>
                             <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
@@ -110,6 +170,18 @@ const Order: React.FC = () => {
                 </TableBody>
             </Table>
 
+            <Pagination className="mt-4  bg-transparent">
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} className="" />
+                                </PaginationItem>
+                                {renderPaginationItems()}
+                                <PaginationItem>
+                                    <PaginationNext href="#" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                        
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
@@ -131,7 +203,6 @@ const Order: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Order Dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -141,7 +212,7 @@ const Order: React.FC = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                        <Button variant="outline" className="text-white" onClick={() => setIsDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleConfirmDelete}>

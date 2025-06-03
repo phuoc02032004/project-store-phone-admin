@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -13,12 +13,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import type { Coupon } from "@/types/Coupon";
+import { Textarea } from "@/components/ui/textarea"
+
 
 interface CouponFormProps {
     initialData?: Coupon | null;
-    onSubmit: (data: Coupon) => void;
+    onSubmit: (data: Partial<Coupon>) => void;
     onCancel: () => void;
 }
 
@@ -36,50 +37,53 @@ const formSchema = z.object({
     description: z.string().optional(),
     type: z.enum(couponTypes, { message: "Coupon type is required." }),
     value: z.number().min(0, { message: "Value must be a positive number." }),
-    startDate: z.string().min(1, { message: "Start date is required." }), // Using string for date for now
-    endDate: z.string().min(1, { message: "End date is required." }), // Using string for date for now
+    startDate: z.string().min(1, { message: "Start date is required." }),
+    endDate: z.string().min(1, { message: "End date is required." }),
     isActive: z.boolean().default(true),
     usageLimit: z.number().nullable().optional(),
     usageLimitPerUser: z.number().min(0).default(1),
     minOrderValue: z.number().min(0).default(0),
     maxDiscountValue: z.number().nullable().optional(),
-    applicableProducts: z.array(z.string()).optional(),
-    applicableCategories: z.array(z.string()).optional(),
-    excludedProducts: z.array(z.string()).optional(),
+    applicableProducts: z.array(z.string()).default([]),
+    applicableCategories: z.array(z.string()).default([]),
+    excludedProducts: z.array(z.string()).default([]),
     buyQuantity: z.number().min(0).default(0),
     getQuantity: z.number().min(0).default(0),
-    giftProductId: z.array(z.string()).optional(),
+    giftProductId: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel }) => {
+    const [step, setStep] = useState(0);
+    const totalSteps = 3; // Define total steps
+
     const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema) as Resolver<FormValues>,
-        mode: 'onSubmit',
+        resolver: zodResolver(formSchema) as any,
         defaultValues: initialData ? {
             ...initialData,
-            startDate: initialData.startDate instanceof Date ? initialData.startDate.toISOString().split('T')[0] : initialData.startDate,
-            endDate: initialData.endDate instanceof Date ? initialData.endDate.toISOString().split('T')[0] : initialData.endDate,
+            giftProductId: Array.isArray(initialData.giftProductId) ? initialData.giftProductId[0] : initialData.giftProductId,
+            startDate: initialData.startDate instanceof Date ? initialData.startDate.toISOString().slice(0, 16) : initialData.startDate.toString().slice(0, 16),
+            endDate: initialData.endDate instanceof Date ? initialData.endDate.toISOString().slice(0, 16) : initialData.endDate.toString().slice(0, 16),
         } : {
-            name: "",
-            code: "",
-            description: "",
+            name: "Summer Sale",
+            code: "SUMMER20",
+            description: "20% off on all items",
             type: "PERCENTAGE_DISCOUNT",
-            value: 0,
-            startDate: new Date().toISOString().split('T')[0],
-            endDate: new Date().toISOString().split('T')[0],
+            value: 20,
+            startDate: "2024-06-01T00:00",
+            endDate: "2024-08-31T23:59",
             isActive: true,
-            usageLimit: null,
+            usageLimit: 100,
             usageLimitPerUser: 1,
-            minOrderValue: 0,
-            maxDiscountValue: null,
-            applicableProducts: [],
-            applicableCategories: [],
-            excludedProducts: [],
-            buyQuantity: 0,
-            getQuantity: 0,
-            giftProductId: [],
+            minOrderValue: 50,
+            maxDiscountValue: 10,
+            applicableProducts: ["60d0fe4f5311530015a10000"],
+            applicableCategories: ["60d0fe4f5311530015a10001"],
+            excludedProducts: ["60d0fe4f5311530015a10002"],
+            buyQuantity: 2,
+            getQuantity: 1,
+            giftProductId: "60d0fe4f5311530015a10003",
         },
     });
 
@@ -87,212 +91,363 @@ const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel
         if (initialData) {
             form.reset({
                 ...initialData,
-                startDate: initialData.startDate instanceof Date ? initialData.startDate.toISOString().split('T')[0] : initialData.startDate,
-                endDate: initialData.endDate instanceof Date ? initialData.endDate.toISOString().split('T')[0] : initialData.endDate,
+                giftProductId: Array.isArray(initialData.giftProductId) ? initialData.giftProductId[0] : initialData.giftProductId,
+                startDate: initialData.startDate instanceof Date ? initialData.startDate.toISOString().slice(0, 16) : initialData.startDate.toString().slice(0, 16),
+                endDate: initialData.endDate instanceof Date ? initialData.endDate.toISOString().slice(0, 16) : initialData.endDate.toString().slice(0, 16),
             });
         }
     }, [initialData, form]);
 
+    const handleNext = async () => {
+        const isValid = await form.trigger(); 
+        if (isValid) {
+            setStep((prevStep) => Math.min(prevStep + 1, totalSteps - 1));
+        }
+    };
+
+    const handlePrevious = () => {
+        setStep((prevStep) => Math.max(prevStep - 1, 0));
+    };
+
     const handleSubmit = (data: FormValues) => {
-        onSubmit(data as Coupon);
+        const submitData = {
+            ...data,
+            giftProductId: data.giftProductId || '',
+            startDate: new Date(data.startDate).toISOString(),
+            endDate: new Date(data.endDate).toISOString(),
+        };
+        onSubmit(submitData);
+        console.log("Submitted Data:", submitData);
     };
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Coupon Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter coupon name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 w-full">
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-x-6 gap-y-5">
+                    {/* Step 1 */}
+                    {step === 0 && (
+                        <>
+                            <FormField
+                                control={form.control}
+                                name="name"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Coupon Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter coupon name" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="code"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Coupon Code</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter coupon code" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="type"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Coupon Type</FormLabel>
+                                        <Select 
+                                            defaultValue={field.value} 
+                                            onValueChange={field.onChange}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="text-white">
+                                                    <SelectValue placeholder="Select coupon type" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {couponTypes.map((type) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type.split('_').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="value"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Value</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="Enter value" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-6">
+                                        <FormLabel>Description</FormLabel>
+                                        <FormControl>
+                                            <Textarea placeholder="Enter description or date" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </>
                     )}
-                />
-                <FormField
-                    control={form.control}
-                    name="code"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Coupon Code</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter coupon code" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+
+                    {/* Step 2 */}
+                    {step === 1 && (
+                        <>
+                            <FormField
+                                control={form.control}
+                                name="startDate"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Start Date</FormLabel>
+                                        <FormControl>
+                                            <Input type="datetime-local" {...field} />
+
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="endDate"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>End Date</FormLabel>
+                                        <FormControl>
+                                            <Input type="datetime-local" placeholder="nn/mm/yyyy" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="usageLimit"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Usage Limit</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                placeholder="Enter usage"
+                                                {...field}
+                                                value={field.value ?? ''}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="usageLimitPerUser"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Usage Limit Per User</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="1" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="minOrderValue"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Minimum Order Value</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="maxDiscountValue"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Maximum Discount Value</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="number"
+                                                placeholder="0"
+                                                {...field}
+                                                value={field.value ?? ''}
+                                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </>
                     )}
-                />
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Description (Optional)</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter description" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+
+                    {/* Step 3 */}
+                    {step === 2 && (
+                        <>
+                            <FormField
+                                control={form.control}
+                                name="buyQuantity"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Buy Quantity</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="getQuantity"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Get Quantity</FormLabel>
+                                        <FormControl>
+                                            <Input type="number" placeholder="0" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="giftProductId"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Gift Product ID</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Enter gift p..." {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="isActive"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Status</FormLabel>
+                                        <Select 
+                                            defaultValue={field.value ? 'true' : 'false'} 
+                                            onValueChange={(value) => field.onChange(value === 'true')}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="text-white">
+                                                    <SelectValue placeholder="Select status" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="true">Active</SelectItem>
+                                                <SelectItem value="false">Inactive</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="applicableProducts"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Applicable Products (IDs)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="e.g., id1, id2"
+                                                {...field}
+                                                value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                                                onChange={e => field.onChange(e.target.value.split(',').map(id => id.trim()).filter(id => id !== ''))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="applicableCategories"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Applicable Categories (IDs)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="e.g., id1, id2"
+                                                {...field}
+                                                value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                                                onChange={e => field.onChange(e.target.value.split(',').map(id => id.trim()).filter(id => id !== ''))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                             <FormField
+                                control={form.control}
+                                name="excludedProducts"
+                                render={({ field }) => (
+                                    <FormItem className="md:col-span-3">
+                                        <FormLabel>Excluded Products (IDs)</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="e.g., id1, id2"
+                                                {...field}
+                                                value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                                                onChange={e => field.onChange(e.target.value.split(',').map(id => id.trim()).filter(id => id !== ''))}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </>
                     )}
-                />
-                <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Coupon Type</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select coupon type" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    <SelectItem value="PERCENTAGE_DISCOUNT">Percentage Discount</SelectItem>
-                                    <SelectItem value="FIXED_AMOUNT_DISCOUNT">Fixed Amount Discount</SelectItem>
-                                    <SelectItem value="FREE_SHIPPING">Free Shipping</SelectItem>
-                                    <SelectItem value="BUY_X_GET_Y">Buy X Get Y</SelectItem>
-                                    <SelectItem value="PRODUCT_GIFT">Product Gift</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
+                </div>
+
+                <div className="flex justify-end space-x-2 pt-6">
+                    {step > 0 && (
+                        <Button type="button" className="text-white" variant="outline" onClick={handlePrevious}>
+                            Previous
+                        </Button>
                     )}
-                />
-                <FormField
-                    control={form.control}
-                    name="value"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Value</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="Enter value" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                    {step < totalSteps - 1 && (
+                        <Button type="button" onClick={handleNext}>
+                            Next
+                        </Button>
                     )}
-                />
-                <FormField
-                    control={form.control}
-                    name="startDate"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Start Date</FormLabel>
-                            <FormControl>
-                                <Input type="date" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
+                    {step === totalSteps - 1 && (
+                        <Button type="submit">
+                            {initialData ? "Save Changes" : "Add Coupon"}
+                        </Button>
                     )}
-                />
-                <FormField
-                    control={form.control}
-                    name="endDate"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>End Date</FormLabel>
-                            <FormControl>
-                                <Input type="date" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="isActive"
-                    render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
-                            <FormControl>
-                                <Checkbox
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                />
-                            </FormControl>
-                            <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                    Is Active
-                                </FormLabel>
-                            </div>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="usageLimit"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Usage Limit (Optional)</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    type="number" 
-                                    placeholder="Enter usage limit" 
-                                    {...field} 
-                                    value={field.value ?? ''} 
-                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} 
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="usageLimitPerUser"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Usage Limit Per User</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="Enter usage limit per user" {...field} onChange={e => field.onChange(parseInt(e.target.value))} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="minOrderValue"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Minimum Order Value</FormLabel>
-                            <FormControl>
-                                <Input type="number" placeholder="Enter minimum order value" {...field} onChange={e => field.onChange(parseFloat(e.target.value))} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="maxDiscountValue"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Maximum Discount Value (Optional)</FormLabel>
-                            <FormControl>
-                                <Input 
-                                    type="number" 
-                                    placeholder="Enter maximum discount value" 
-                                    {...field} 
-                                    value={field.value ?? ''} 
-                                    onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} 
-                                />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                {/* Applicable Products, Categories, Excluded Products, Buy/Get Quantity, Gift Product ID can be added with multi-select or array inputs */}
-                <div className="flex justify-end space-x-2">
-                    <Button type="button" variant="outline" onClick={onCancel}>
+                     <Button type="button" className="text-white" variant="outline" onClick={onCancel}>
                         Cancel
-                    </Button>
-                    <Button type="submit">
-                        {initialData ? "Save Changes" : "Add Coupon"}
                     </Button>
                 </div>
             </form>

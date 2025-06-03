@@ -15,11 +15,11 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Category as CategoryType } from "@/types/Category";
 import { getCategories, addCategory, updateCategory, deleteCategory } from "@/api/category";
 import CategoryForm from "@/components/category/CategoryForm";
+import { toast } from "sonner"
 
 const Category: React.FC = () => {
     const [categories, setCategories] = useState<CategoryType[]>([]);
@@ -43,24 +43,39 @@ const Category: React.FC = () => {
     const handleAddCategory = () => {
         setSelectedCategory(null);
         setIsFormDialogOpen(true);
+        toast("Ready to add a new category!");
     };
 
     const handleEditCategory = (category: CategoryType) => {
         setSelectedCategory(category);
         setIsFormDialogOpen(true);
+        toast("Ready to edit the category!");
     };
 
     const handleDeleteCategory = (category: CategoryType) => {
         setSelectedCategory(category);
         setIsDeleteDialogOpen(true);
+        toast.error("Are you sure you want to delete this category?");
     };
 
-    const handleSaveCategory = async (categoryData: CategoryType) => {
+    const handleSaveCategory = async (categoryData: { name: string; description?: string | undefined; parentId?: string | undefined; image?: File | undefined; }) => {
+        const { image, ...rest } = categoryData;
         try {
             if (selectedCategory) {
-                await updateCategory(selectedCategory._id, categoryData);
+                await updateCategory(selectedCategory._id, rest);
+                toast.success("Category updated successfully!");
             } else {
-                await addCategory(categoryData);
+                if (image) {
+                    const formData = new FormData();
+                    formData.append('name', rest.name);
+                    if (rest.description) formData.append('description', rest.description);
+                    if (rest.parentId) formData.append('parentId', rest.parentId);
+                    formData.append('image', image);
+                    await addCategory(formData as any); 
+                } else {
+                    await addCategory(rest as any); 
+                }
+                toast.success("Category added successfully!");
             }
             fetchCategories();
             setIsFormDialogOpen(false);
@@ -75,21 +90,26 @@ const Category: React.FC = () => {
                 await deleteCategory(selectedCategory._id);
                 fetchCategories();
                 setIsDeleteDialogOpen(false);
+                toast.success("Category deleted successfully!");
             } catch (error) {
                 console.error("Error deleting category:", error);
             }
         }
     };
 
+    const parentCategories = categories.filter(cat => cat.parent === null);
+    const childCategories = categories.filter(cat => cat.parent !== null);
+
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Category Management</h1>
+            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Category Management</h1>
 
             <Button onClick={handleAddCategory} className="mb-4">
                 Add New Category
             </Button>
 
-            <Table>
+            <h2 className="text-xl font-semibold mb-2 text-white">Parent Categories</h2>
+            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Name</TableHead>
@@ -100,7 +120,7 @@ const Category: React.FC = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {categories.map((category) => (
+                    {parentCategories.slice().reverse().map((category) => (
                         <TableRow key={category._id}>
                             <TableCell>{category.name}</TableCell>
                             <TableCell>{category.slug}</TableCell>
@@ -109,7 +129,7 @@ const Category: React.FC = () => {
                                 {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover" />}
                             </TableCell>
                             <TableCell>
-                                <Button variant="outline" size="sm" onClick={() => handleEditCategory(category)}>
+                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditCategory(category)}>
                                     Edit
                                 </Button>
                                 <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCategory(category)}>
@@ -121,7 +141,42 @@ const Category: React.FC = () => {
                 </TableBody>
             </Table>
 
-            {/* Category Form Dialog (Add/Edit) */}
+            <h2 className="text-xl font-semibold text-white mt-8 mb-2">Child Categories</h2>
+            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Slug</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Image</TableHead>
+                        <TableHead>Parent</TableHead> 
+                        <TableHead>Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {childCategories.slice().reverse().map((category) => (
+                        <TableRow key={category._id}>
+                            <TableCell>{category.name}</TableCell>
+                            <TableCell>{category.slug}</TableCell>
+                            <TableCell>{category.description}</TableCell>
+                            <TableCell>
+                                {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover" />}
+                            </TableCell>
+                            <TableCell>{category.parent ? category.parent.name : 'N/A'}</TableCell> 
+                            <TableCell>
+                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditCategory(category)}>
+                                    Edit
+                                </Button>
+                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCategory(category)}>
+                                    Delete
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+
+
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -138,7 +193,6 @@ const Category: React.FC = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Category Dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent>
                     <DialogHeader>
@@ -148,7 +202,7 @@ const Category: React.FC = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                        <Button variant="outline" className="text-white" onClick={() => setIsDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleConfirmDelete}>

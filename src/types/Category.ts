@@ -3,9 +3,9 @@ export interface Category{
     name: string;
     slug: string;
     description: string;
-    parent: Category[] | null;
+    parent: Category | null;
     level: number;
-    ancestors: Ancestors[] | null;
+    ancestors: Ancestors| null;
     image: string;
     createdAt: string;
     updatedAt: string;

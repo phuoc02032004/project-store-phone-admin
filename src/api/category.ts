@@ -12,7 +12,7 @@ const getCategories = async () => {
 
 const getCategory = async (id: string) => {
     try {
-        const response = await axiosClient.get<Category>(`/category/${id}`);
+        const response = await axiosClient.get<Category>(`/categories/${id}`);
         return response.data;
     } catch (error) {
         throw error;
@@ -21,7 +21,11 @@ const getCategory = async (id: string) => {
 
 const addCategory = async (category: Category) => {
     try {
-        const response = await axiosClient.post<Category>("/category", category);
+        const response = await axiosClient.post<Category>("/categories", category,{
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     } catch (error) {
         throw error;
@@ -30,7 +34,7 @@ const addCategory = async (category: Category) => {
 
 const updateCategory = async (id: string, category: Partial<Category>) => {
     try {
-        const response = await axiosClient.put<Category>(`/category/${id}`, category);
+        const response = await axiosClient.put<Category>(`/categories/${id}`, category);
         return response.data;
     } catch (error) {
         throw error;
@@ -39,7 +43,7 @@ const updateCategory = async (id: string, category: Partial<Category>) => {
 
 const deleteCategory = async (id: string) => {
     try {
-        const response = await axiosClient.delete(`/category/${id}`);
+        const response = await axiosClient.delete(`/categories/${id}`);
         return response.data;
     } catch (error) {
         throw error;

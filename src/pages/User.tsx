@@ -15,12 +15,10 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { User as UserType } from "@/types/User";
 import { getUsers, promoteUserToAdmin, deleteUser } from "@/api/user";
+import { toast } from "sonner"
 
 const User: React.FC = () => {
     const [users, setUsers] = useState<UserType[]>([]);
@@ -44,11 +42,13 @@ const User: React.FC = () => {
     const handleEdit = (user: UserType) => {
         setSelectedUser(user);
         setIsEditDialogOpen(true);
+        toast("Ready to promote user to admin!");
     };
 
     const handleDelete = (user: UserType) => {
         setSelectedUser(user);
         setIsDeleteDialogOpen(true);
+        toast.error("Are you sure you want to delete this user?");
     };
 
     const handleSaveEdit = async () => {
@@ -57,6 +57,7 @@ const User: React.FC = () => {
                 await promoteUserToAdmin(selectedUser._id);
                 fetchUsers();
                 setIsEditDialogOpen(false);
+                toast.success("User promoted to admin successfully!");
             } catch (error) {
                 console.error("Error updating user:", error);
             }
@@ -69,6 +70,7 @@ const User: React.FC = () => {
                 await deleteUser(selectedUser._id);
                 fetchUsers();
                 setIsDeleteDialogOpen(false);
+                toast.success("User deleted successfully!");
             } catch (error) {
                 console.error("Error deleting user:", error);
             }
@@ -77,9 +79,9 @@ const User: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">User Management</h1>
+            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">User Management</h1>
 
-            <Table>
+            <Table className="bg-white/90 p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Username</TableHead>
@@ -143,7 +145,7 @@ const User: React.FC = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                        <Button variant="outline" className="text-white" onClick={() => setIsDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleConfirmDelete}>

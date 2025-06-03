@@ -19,14 +19,14 @@ export interface Coupon {
     timesUsed: number;
     usageLimitPerUser: number;
     minOrderValue: number;
-    maxDiscountValue: number;
+    maxDiscountValue: number | null;
     applicableProducts: string[];
-    applicableCategories: string[],
-    excludedProducts: string[],
+    applicableCategories: string[];
+    excludedProducts: string[];
     buyQuantity: number;
     getQuantity: number;
-    giftProductId:string[],
-    createdBy: string[],
+    giftProductId?: string;
+    createdBy: string[];
     createdAt: Date;
     updatedAt: Date;
     __v: number;
