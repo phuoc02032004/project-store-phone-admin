@@ -49,7 +49,7 @@ const Order: React.FC = () => {
     const fetchOrders = async () => {
         try {
             const data = await getOrders();
-            setOrders(data);
+            setOrders(data.slice().reverse());// Reverse the order to show the latest orders first
         } catch (error) {
             console.error("Error fetching orders:", error);
         }

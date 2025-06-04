@@ -147,7 +147,7 @@ const Product: React.FC = () => {
         <div className="p-4">
             <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Product Management</h1>
 
-            <Button onClick={handleAddProduct} className="mb-4">
+            <Button onClick={handleAddProduct} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)]">
                 Add New Product
             </Button>
 
@@ -169,10 +169,10 @@ const Product: React.FC = () => {
                                 <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
                             </TableCell>
                             <TableCell>
-                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditProduct(product)}>
+                                <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]" size="sm" onClick={() => handleEditProduct(product)}>
                                     Edit
                                 </Button>
-                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteProduct(product)}>
+                                <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)]" onClick={() => handleDeleteProduct(product)}>
                                     Delete
                                 </Button>
                             </TableCell>
@@ -218,7 +218,7 @@ const Product: React.FC = () => {
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" className="text-white" onClick={() => setIsDeleteDialogOpen(false)}>
+                        <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]" onClick={() => setIsDeleteDialogOpen(false)}>
                             Cancel
                         </Button>
                         <Button variant="destructive" onClick={handleConfirmDelete}>

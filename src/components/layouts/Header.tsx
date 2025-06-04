@@ -27,8 +27,8 @@ const Header: React.FC = () => {
   }, [fetchNotifications]);
 
   return (
-    <header className="sticky top-0 z-30 p-3 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 shadow-2xl backdrop:backdrop-blur-3xl">
-      <SidebarTrigger className="text-white" />
+    <header className="sticky top-0 z-30 p-3 flex h-14 items-center gap-4 border-b px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 shadow-2xl backdrop:backdrop-blur-3xl">
+      <SidebarTrigger className="text-white bg-[linear-gradient(to_right,#43978D,#264D59)]" />
       <h1 className="text-2xl text-white font-bold mr-auto">Admin Panel</h1>
       <Popover onOpenChange={(open) => { setIsDesktopNotificationOpen(open); handleOpenNotification(); }}>
           <PopoverTrigger asChild>

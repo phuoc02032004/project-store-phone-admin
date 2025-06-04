@@ -14,6 +14,8 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface LoginFormProps {
     onLoginSuccess: () => void;
@@ -22,21 +24,26 @@ interface LoginFormProps {
 const formSchema = z.object({
     email: z.string().email({ message: "Invalid email address." }),
     password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+    rememberMe: z.boolean().default(false).optional(),
 });
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: "",
             password: "",
+            rememberMe: false,
         },
     });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         setError("");
+        setIsLoading(true);
         try {
             await login(values.email, values.password);
             onLoginSuccess();
@@ -47,15 +54,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                 setError("Invalid email or password.");
             }
             console.error("Login error:", err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <Card className="mx-auto max-w-sm">
-            <CardHeader>
-                <CardTitle className="text-2xl">Login</CardTitle>
-                <CardDescription>
-                    Enter your email below to login to your account
+        <Card className="mx-auto max-w-sm w-full">
+            <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl text-center">Login</CardTitle>
+                <CardDescription className="text-center">
+                    Enter your email and password to login to your account
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -86,14 +95,33 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
                                         </a>
                                     </div>
                                     <FormControl>
-                                        <Input type="password" {...field} />
+                                        <div className="relative bg-transparent">
+                                            <Input type={showPassword ? "text" : "password"} {...field} />
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="absolute right-0 top-0 h-full px-3 py-1 hover:bg-transparent "
+                                                style={{ backgroundColor: 'transparent' }}
+                                                onClick={() => setShowPassword((prev) => !prev)}
+                                                disabled={isLoading}
+                                            >
+                                                {showPassword ? (
+                                                    <EyeOff className="h-4 w-4" />
+                                                ) : (
+                                                    <Eye className="h-4 w-4" />
+                                                )}
+                                            </Button>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
-                        <Button type="submit" className="w-full">
+                        
+                        {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Login
                         </Button>
                     </form>

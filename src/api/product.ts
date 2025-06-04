@@ -9,7 +9,7 @@ const productApi = axios.create({
 
 productApi.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("tokenAdmin");
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }

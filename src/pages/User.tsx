@@ -97,10 +97,10 @@ const User: React.FC = () => {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.role}</TableCell>
                             <TableCell>
-                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEdit(user)}>
+                                <Button variant="outline" className="text-white border-none bg-[linear-gradient(to_right,#758EB7,#041B2D)]" size="sm" onClick={() => handleEdit(user)}>
                                     Edit
                                 </Button>
-                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDelete(user)}>
+                                <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#264D59,#041B2D)]" onClick={() => handleDelete(user)}>
                                     Delete
                                 </Button>
                             </TableCell>

@@ -3,10 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { getOrders } from "@/api/order";
 import type { Order } from "@/types/Order";
-// Import shadcn chart components
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-// Import recharts components
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+// Import ApexCharts components
+import WeeklyRevenueChart from "@/components/charts/WeeklyRevenueChart";
+import MonthlyRevenueChart from "@/components/charts/MonthlyRevenueChart";
+import SalesChart from "@/components/charts/SalesChart";
+import ProductsSoldChart from "@/components/charts/ProductsSoldChart";
 
 const Home: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -56,31 +57,27 @@ const Home: React.FC = () => {
 
   // Add functions to calculate weekly and monthly revenue
   const calculateWeeklyRevenue = (orders: Order[]) => {
-    const weeklyData: Record<string, number> = {};
+    const dailyData: Record<string, number> = {};
 
     orders.forEach(order => {
       const date = new Date(order.createdAt);
-      // Get the start of the week (e.g., Monday)
-      const startOfWeek = new Date(date);
-      startOfWeek.setDate(date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1)); // Adjust for Sunday as last day
-      startOfWeek.setHours(0, 0, 0, 0);
-
-      const weekKey = startOfWeek.toISOString().split('T')[0]; // Use start date as key
+      // Use the start of the day timestamp as the key
+      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
       const revenue = order.finalAmount !== undefined ? order.finalAmount : order.totalAmount;
 
-      if (!weeklyData[weekKey]) {
-        weeklyData[weekKey] = 0;
+      if (!dailyData[startOfDay]) {
+        dailyData[startOfDay] = 0;
       }
-      weeklyData[weekKey] += revenue;
+      dailyData[startOfDay] += revenue;
     });
 
-    // Convert to array and sort by date
-    const sortedWeeklyData = Object.entries(weeklyData)
-      .map(([date, revenue]) => ({ name: date, revenue }))
-      .sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+    // Convert to array and sort by timestamp
+    const sortedDailyData = Object.entries(dailyData)
+      .map(([timestamp, revenue]) => ({ x: parseInt(timestamp), y: revenue }))
+      .sort((a, b) => a.x - b.x);
 
-    setWeeklyRevenueData(sortedWeeklyData);
+    setWeeklyRevenueData(sortedDailyData);
   };
 
   const calculateMonthlyRevenue = (orders: Order[]) => {
@@ -224,115 +221,16 @@ const Home: React.FC = () => {
       </div>
 
       {/* Weekly Revenue Chart */}
-      <div className="grid gap-4">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Doanh Thu Theo Tuần</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ChartContainer config={{ revenue: { label: "Revenue", color: "hsl(var(--chart-1))" } }} className="min-h-[300px] w-full">
-              <LineChart
-                data={weeklyRevenueData}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  left: 60,
-                  bottom: 20,
-                }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) => new Date(value).toLocaleDateString('vi-VN', { month: 'short', day: 'numeric' })}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 }).format(value)} VND`}
-                />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                <Line
-                  dataKey="revenue"
-                  type="monotone"
-                  stroke="var(--color-revenue)"
-                  strokeWidth={2}
-                  dot={{
-                    fill: "var(--color-revenue)",
-                  }}
-                  activeDot={{
-                    r: 6,
-                    fill: "var(--color-revenue)",
-                    stroke: "white",
-                    strokeWidth: 3,
-                  }}
-                />
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+      <WeeklyRevenueChart data={weeklyRevenueData} />
 
       {/* Monthly Revenue Chart */}
-      <div className="grid gap-4">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Doanh Thu Theo Tháng</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <ChartContainer config={{ revenue: { label: "Revenue", color: "hsl(var(--chart-1))" } }} className="min-h-[300px] w-full">
-              <LineChart
-                data={monthlyRevenueData}
-                margin={{
-                  top: 20,
-                  right: 20,
-                  left: 60,
-                  bottom: 20,
-                }}
-              >
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={8}
-                  tickFormatter={(value) => {
-                    const [year, month] = value.split('-');
-                    return new Date(parseInt(year), parseInt(month) - 1).toLocaleDateString('vi-VN', { month: 'short', year: 'numeric' });
-                  }}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `${new Intl.NumberFormat('vi-VN', { notation: 'compact', maximumFractionDigits: 1 }).format(value)} VND`}
-                />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                <Line
-                  dataKey="revenue"
-                  type="monotone"
-                  stroke="var(--color-revenue)"
-                  strokeWidth={2}
-                  dot={{
-                    fill: "var(--color-revenue)",
-                  }}
-                  activeDot={{
-                    r: 6,
-                    fill: "var(--color-revenue)",
-                    stroke: "white",
-                    strokeWidth: 3,
-                  }}
-                />
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+      <MonthlyRevenueChart data={monthlyRevenueData} />
+
+      {/* Sales Chart */}
+      <SalesChart data={salesChartData} />
+
+      {/* Products Sold Chart */}
+      <ProductsSoldChart data={productsSoldChartData} />
     </div>
   );
 };

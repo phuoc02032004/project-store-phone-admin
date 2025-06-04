@@ -88,14 +88,14 @@ const Coupon: React.FC = () => {
     };
 
     return (
-        <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Coupon Management</h1>
+        <div className={`p-4 ${isFormDialogOpen || isDeleteDialogOpen ? 'filter blur-sm' : ''}`}>
+            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Coupon Management</h1>
 
             <Button onClick={handleAddCoupon} className="mb-4">
                 Add New Coupon
             </Button>
 
-            <Table>
+            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Name</TableHead>
@@ -133,7 +133,7 @@ const Coupon: React.FC = () => {
 
             {/* Coupon Form Dialog (Add/Edit) */}
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent className="max-w-3xl">
+                <DialogContent className="max-w-3xl bg-white">
                     <DialogHeader>
                         <DialogTitle>{selectedCoupon ? "Edit Coupon" : "Add New Coupon"}</DialogTitle>
                         <DialogDescription>
@@ -150,7 +150,7 @@ const Coupon: React.FC = () => {
 
             {/* Delete Coupon Dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent className="bg-white">
                     <DialogHeader>
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>

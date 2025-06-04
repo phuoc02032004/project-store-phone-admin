@@ -56,7 +56,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel }) => {
     const [step, setStep] = useState(0);
-    const totalSteps = 3; // Define total steps
+    const totalSteps = 3; 
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema) as any,
@@ -66,24 +66,24 @@ const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel
             startDate: initialData.startDate instanceof Date ? initialData.startDate.toISOString().slice(0, 16) : initialData.startDate.toString().slice(0, 16),
             endDate: initialData.endDate instanceof Date ? initialData.endDate.toISOString().slice(0, 16) : initialData.endDate.toString().slice(0, 16),
         } : {
-            name: "Summer Sale",
-            code: "SUMMER20",
-            description: "20% off on all items",
-            type: "PERCENTAGE_DISCOUNT",
-            value: 20,
-            startDate: "2024-06-01T00:00",
-            endDate: "2024-08-31T23:59",
-            isActive: true,
-            usageLimit: 100,
-            usageLimitPerUser: 1,
-            minOrderValue: 50,
-            maxDiscountValue: 10,
-            applicableProducts: ["60d0fe4f5311530015a10000"],
-            applicableCategories: ["60d0fe4f5311530015a10001"],
-            excludedProducts: ["60d0fe4f5311530015a10002"],
-            buyQuantity: 2,
-            getQuantity: 1,
-            giftProductId: "60d0fe4f5311530015a10003",
+            // name: "Summer Sale",
+            // code: "SUMMER20",
+            // description: "20% off on all items",
+            // type: "PERCENTAGE_DISCOUNT",
+            // value: 20,
+            // startDate: "2024-06-01T00:00",
+            // endDate: "2024-08-31T23:59",
+            // isActive: true,
+            // usageLimit: 100,
+            // usageLimitPerUser: 1,
+            // minOrderValue: 50,
+            // maxDiscountValue: 10,
+            // applicableProducts: ["60d0fe4f5311530015a10000"],
+            // applicableCategories: ["60d0fe4f5311530015a10001"],
+            // excludedProducts: ["60d0fe4f5311530015a10002"],
+            // buyQuantity: 2,
+            // getQuantity: 1,
+            // giftProductId: "60d0fe4f5311530015a10003",
         },
     });
 
@@ -109,7 +109,7 @@ const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel
         setStep((prevStep) => Math.max(prevStep - 1, 0));
     };
 
-    const handleSubmit = (data: FormValues) => {
+const handleSubmit = (data: FormValues) => {
         const submitData = {
             ...data,
             giftProductId: data.giftProductId || '',
@@ -118,6 +118,31 @@ const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel
         };
         onSubmit(submitData);
         console.log("Submitted Data:", submitData);
+
+        // Clear form fields after successful submission for new coupons
+        if (!initialData) {
+            form.reset({
+                name: "",
+                code: "",
+                description: "",
+                type: "PERCENTAGE_DISCOUNT", // Or a sensible default
+                value: 0,
+                startDate: "",
+                endDate: "",
+                isActive: true,
+                usageLimit: null,
+                usageLimitPerUser: 1,
+                minOrderValue: 0,
+                maxDiscountValue: null,
+                applicableProducts: [],
+                applicableCategories: [],
+                excludedProducts: [],
+                buyQuantity: 0,
+                getQuantity: 0,
+                giftProductId: "",
+            });
+             setStep(0); // Reset to the first step
+        }
     };
 
     return (

@@ -81,8 +81,13 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }
   }, [notifications]);
   useEffect(() => {
-    fetchNotifications();
-  }, []); 
+    if(!localStorage.getItem('tokenAdmin')) {
+      console.log("You need to be logged in to view notifications.");
+      return;
+    } else {
+      fetchNotifications();
+    }
+  }, []);
 
   useEffect(() => {
   }, [unreadCount]);
