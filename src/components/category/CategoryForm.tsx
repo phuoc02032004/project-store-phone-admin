@@ -106,7 +106,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSubmit, onCa
                             <FormLabel>Parent Category (Optional)</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-none text-white">
                                         <SelectValue placeholder="Select a parent category" />
                                     </SelectTrigger>
                                 </FormControl>
@@ -141,10 +141,10 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ initialData, onSubmit, onCa
                     )}
                 />
                 <div className="flex justify-end space-x-2">
-                    <Button type="button" className="text-white" variant="outline" onClick={onCancel}>
+                    <Button type="button" className="!bg-transparent" variant="outline" onClick={onCancel}>
                         Cancel
                     </Button>
-                    <Button type="submit">
+                    <Button type="submit" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]">
                         {initialData ? "Save Changes" : "Add Category"}
                     </Button>
                 </div>

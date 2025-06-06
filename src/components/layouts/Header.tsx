@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
-import { BellIcon, HomeIcon } from "lucide-react";
+import { BellIcon } from "lucide-react";
 import { useNotifications } from "@/context/NotificationContext";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NotificationTable from "@/components/notification/NotificationTable";
@@ -27,9 +25,9 @@ const Header: React.FC = () => {
   }, [fetchNotifications]);
 
   return (
-    <header className="sticky top-0 z-30 p-3 flex h-14 items-center gap-4 border-b px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 shadow-2xl backdrop:backdrop-blur-3xl">
-      <SidebarTrigger className="text-white bg-[linear-gradient(to_right,#43978D,#264D59)]" />
-      <h1 className="text-2xl text-white font-bold mr-auto">Admin Panel</h1>
+    <header className="sticky top-0 z-30 py-3 px-4 flex h-14 items-center gap-4 border-b sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:py-4 sm:px-6 shadow-2xl backdrop:backdrop-blur-3xl">
+      <SidebarTrigger className="text-white bg-[linear-gradient(to_right,#43978D,#264D59)] !border-0" />
+      <div className="text-2xl sm:text-2xl text-white font-bold mr-auto">Admin Panel</div>
       <Popover onOpenChange={(open) => { setIsDesktopNotificationOpen(open); handleOpenNotification(); }}>
           <PopoverTrigger asChild>
             <div className="relative inline-block cursor-pointer">

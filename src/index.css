@@ -68,3 +68,7 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.hide-shadcn-dialog-close > button[aria-label="Close"] {
+  display: none !important;
+}

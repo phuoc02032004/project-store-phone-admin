@@ -49,7 +49,7 @@ const Order: React.FC = () => {
     const fetchOrders = async () => {
         try {
             const data = await getOrders();
-            setOrders(data.slice().reverse());// Reverse the order to show the latest orders first
+            setOrders(data.slice().reverse());
         } catch (error) {
             console.error("Error fetching orders:", error);
         }
@@ -94,7 +94,7 @@ const Order: React.FC = () => {
     };
 
     const totalPages = Math.ceil(orders.length / itemsPerPage);
-        const pageRange = 2; // Number of pages to show around the current page
+        const pageRange = 2; 
     
         const renderPaginationItems = () => {
             const items = [];
@@ -122,7 +122,6 @@ const Order: React.FC = () => {
                 );
             }
     
-            // Last page
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
                     items.push(<PaginationEllipsis key="ellipsis-end" className="text-black" />);
@@ -139,36 +138,39 @@ const Order: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Order Management</h1>
-            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Order ID</TableHead>
-                        <TableHead>User</TableHead>
-                        <TableHead>Total Amount</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
-                        <TableRow key={order._id}>
-                            <TableCell>{order._id}</TableCell>
-                            <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
-                            <TableCell>{order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</TableCell>
-                            <TableCell>{order.orderStatus}</TableCell>
-                            <TableCell>
-                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleViewDetails(order)}>
-                                    View Details
-                                </Button>
-                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteOrder(order)}>
-                                    Delete
-                                </Button>
-                            </TableCell>
+            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Order Management</div>
+
+            <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
+                <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Order ID</TableHead>
+                            <TableHead>User</TableHead>
+                            <TableHead>Total Amount</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
+                            <TableRow key={order._id}>
+                                <TableCell>{order._id}</TableCell>
+                                <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
+                                <TableCell>{order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</TableCell>
+                                <TableCell>{order.orderStatus}</TableCell>
+                                <TableCell>
+                                    <Button variant="outline" className="!bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0 text-white" size="sm" onClick={() => handleViewDetails(order)}>
+                                        View Details
+                                    </Button>
+                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0 text-white" onClick={() => handleDeleteOrder(order)}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
 
             <Pagination className="mt-4  bg-transparent">
                             <PaginationContent>
@@ -183,7 +185,7 @@ const Order: React.FC = () => {
                         </Pagination>
                         
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>Order Details</DialogTitle>
                         <DialogDescription>
@@ -204,7 +206,7 @@ const Order: React.FC = () => {
             </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>

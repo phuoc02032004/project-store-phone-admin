@@ -86,7 +86,7 @@ const SidebarNav: React.FC = () => {
     <Sidebar className="flex flex-col bg-transparent text-white min-h-screen shadow-2xl border-r border-slate-700/50 ">
       <SidebarHeader className="p-4 border-b border-slate-700/50">
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="p-2 bg-[linear-gradient(to_right,#43978D,#264D59)] rounded-lg group-hover:bg-sky-500 transition-colors">
+          <div className="p-2 bg-[linear-gradient(to_right,#43978D,#264D59)] rounded-lg group-hover:bg-sky-500 transition-colors !border-none">
             <HomeIcon className="size-6 text-white" />
           </div>
           <span className="text-2xl font-bold tracking-tight text-[#43978D]">Admin Panel</span>
@@ -103,13 +103,13 @@ const SidebarNav: React.FC = () => {
         <NavLinkItem item={settingsNavItem} />
       </SidebarContent>
 
-      <SidebarFooter className="p-4 mt-auto border-t border-slate-700/50">
+      <SidebarFooter className="p-4  mt-auto">
         <Button
           variant="ghost"
-          className="w-full justify-start rounded-md px-3 py-2.5 text-sm font-medium hover:text-slate-300 hover:bg-red-600/80 text-white transition-colors duration-200 ease-in-out group bg-[linear-gradient(to_right,#43978D,#264D59)]"
+          className="w-full justify-start rounded-md px-3 py-2.5 text-sm font-medium hover:text-slate-300 hover:bg-red-600/80 text-white transition-colors duration-200 ease-in-out group bg-[linear-gradient(to_right,#43978D,#264D59)] !border-0"
           onClick={handleLogout}
         >
-          <DoorClosed className="mr-3 size- group-hover:text-white" />
+          <DoorClosed className="mr-3 size- group-hover:text-white " />
           Logout
         </Button>
       </SidebarFooter>

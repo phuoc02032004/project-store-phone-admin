@@ -132,7 +132,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderId, onSubmit, onCancel, isVi
                            <FormLabel>Payment Method</FormLabel>
                            <Select onValueChange={field.onChange} value={field.value} disabled={!isViewMode}>
                                <FormControl>
-                                   <SelectTrigger className="text-white">
+                                   <SelectTrigger className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0">
                                        <SelectValue placeholder="Select a payment method"/>
                                    </SelectTrigger>
                                </FormControl>
@@ -155,7 +155,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderId, onSubmit, onCancel, isVi
                            <FormLabel>Order Status</FormLabel>
                            <Select onValueChange={field.onChange} value={field.value} disabled={!isViewMode}>
                                <FormControl>
-                                   <SelectTrigger className="text-white">
+                                   <SelectTrigger className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0">
                                        <SelectValue placeholder="Select order status" />
                                    </SelectTrigger>
                                </FormControl>
@@ -227,11 +227,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ orderId, onSubmit, onCancel, isVi
 
 
                <div className="flex justify-end space-x-2">
-                   <Button type="button" className="text-white" variant="outline" onClick={onCancel}>
+                   <Button type="button" className="!bg-transparent" variant="outline" onClick={onCancel}>
                        Close
                    </Button>
                    {isViewMode && orderData && (
-                        <Button type="button" onClick={handleStatusUpdate}>
+                        <Button type="button" className="bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0 text-white" onClick={handleStatusUpdate}>
                            Update Status
                        </Button>
                    )}

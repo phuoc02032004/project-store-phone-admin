@@ -128,7 +128,6 @@ const Product: React.FC = () => {
             );
         }
 
-        // Last page
         if (endPage < totalPages) {
             if (endPage < totalPages - 1) {
                 items.push(<PaginationEllipsis key="ellipsis-end" className="text-black" />);
@@ -144,42 +143,44 @@ const Product: React.FC = () => {
     };
 
     return (
-        <div className="p-4">
-            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Product Management</h1>
+        <div className="p-2 sm:p-4">
+            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Product Management</div>
 
-            <Button onClick={handleAddProduct} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)]">
+            <Button onClick={handleAddProduct} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0">
                 Add New Product
             </Button>
 
-            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).reverse().map((product) => (
-                        <TableRow key={product._id}>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.description}</TableCell>
-                            <TableCell>
-                                <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
-                            </TableCell>
-                            <TableCell>
-                                <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]" size="sm" onClick={() => handleEditProduct(product)}>
-                                    Edit
-                                </Button>
-                                <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)]" onClick={() => handleDeleteProduct(product)}>
-                                    Delete
-                                </Button>
-                            </TableCell>
+            <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
+                <Table className="bg-white sm:p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead>Image</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).reverse().map((product) => (
+                            <TableRow key={product._id}>
+                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">{product.name}</TableCell>
+                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">{product.description}</TableCell>
+                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">
+                                    <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
+                                </TableCell>
+                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">
+                                    <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0 text-xs py-1 px-2" size="sm" onClick={() => handleEditProduct(product)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0 text-xs py-1 px-2" onClick={() => handleDeleteProduct(product)}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
 
             <Pagination className="mt-4  bg-transparent">
                 <PaginationContent>
@@ -194,7 +195,7 @@ const Product: React.FC = () => {
             </Pagination>
 
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent>
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>{selectedProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
                         <DialogDescription>
@@ -210,7 +211,7 @@ const Product: React.FC = () => {
             </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>

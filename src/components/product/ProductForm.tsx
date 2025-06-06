@@ -127,7 +127,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, onCanc
                                 <FormLabel className="text-gray-700 font-medium">Category</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
-                                        <SelectTrigger className="bg-white text-white border-gray-300">
+                                        <SelectTrigger className="text-white border-gray-300 !bg-white">
                                             <SelectValue placeholder="Select a category" />
                                         </SelectTrigger>
                                     </FormControl>
@@ -218,8 +218,9 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, onCanc
                                         type="checkbox"
                                         checked={field.value}
                                         onChange={(e) => field.onChange(e.target.checked)}
-                                        className="h-6 w-6 border-gray-300 bg-white text-primary focus:ring-2 focus:ring-primary rounded-2xl"
+                                        className="h-6 w-6"
                                     />
+                                    
                                 </FormControl>
                                 <div className="space-y-1 leading-none">
                                     <FormLabel className="text-gray-700">New Arrival</FormLabel>
@@ -257,10 +258,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, onCanc
                 </div>
 
                 <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button type="button" className="text-white" variant="outline" onClick={onCancel}>
+                    <Button type="button" className="text-black !bg-white" variant="outline" onClick={onCancel}>
                         Cancel
                     </Button>
-                    <Button type="submit" className="bg-primary text-white hover:bg-primary/90">
+                    <Button type="submit" className="bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0] text-white hover:bg-primary/90">
                         {initialData ? "Save Changes" : "Add Product"}
                     </Button>
                 </div>

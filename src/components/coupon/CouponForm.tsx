@@ -66,24 +66,24 @@ const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel
             startDate: initialData.startDate instanceof Date ? initialData.startDate.toISOString().slice(0, 16) : initialData.startDate.toString().slice(0, 16),
             endDate: initialData.endDate instanceof Date ? initialData.endDate.toISOString().slice(0, 16) : initialData.endDate.toString().slice(0, 16),
         } : {
-            // name: "Summer Sale",
-            // code: "SUMMER20",
-            // description: "20% off on all items",
-            // type: "PERCENTAGE_DISCOUNT",
-            // value: 20,
-            // startDate: "2024-06-01T00:00",
-            // endDate: "2024-08-31T23:59",
-            // isActive: true,
-            // usageLimit: 100,
-            // usageLimitPerUser: 1,
-            // minOrderValue: 50,
-            // maxDiscountValue: 10,
-            // applicableProducts: ["60d0fe4f5311530015a10000"],
-            // applicableCategories: ["60d0fe4f5311530015a10001"],
-            // excludedProducts: ["60d0fe4f5311530015a10002"],
-            // buyQuantity: 2,
-            // getQuantity: 1,
-            // giftProductId: "60d0fe4f5311530015a10003",
+            name: "",
+            code: "",
+            description: "",
+            type: "PERCENTAGE_DISCOUNT",
+            value: 0,
+            startDate: "",
+            endDate: "",
+            isActive: true,
+            usageLimit: 0,
+            usageLimitPerUser: 0,
+            minOrderValue: 0,
+            maxDiscountValue: 0,
+            applicableProducts: [""],
+            applicableCategories: [""],
+            excludedProducts: [""],
+            buyQuantity: 0,
+            getQuantity: 0,
+            giftProductId: "",
         },
     });
 
@@ -99,9 +99,18 @@ const CouponForm: React.FC<CouponFormProps> = ({ initialData, onSubmit, onCancel
     }, [initialData, form]);
 
     const handleNext = async () => {
-        const isValid = await form.trigger(); 
+        let fieldsToValidate: (keyof FormValues)[] = [];
+        if (step === 0) {
+            fieldsToValidate = ['name', 'code', 'type', 'value', 'description'];
+        }
+
+        const isValid = await form.trigger(fieldsToValidate);
+
         if (isValid) {
-            setStep((prevStep) => Math.min(prevStep + 1, totalSteps - 1));
+            setStep((prevStep) => {
+                const nextStep = Math.min(prevStep + 1, totalSteps - 1);
+                return nextStep;
+            });
         }
     };
 
@@ -117,15 +126,13 @@ const handleSubmit = (data: FormValues) => {
             endDate: new Date(data.endDate).toISOString(),
         };
         onSubmit(submitData);
-        console.log("Submitted Data:", submitData);
 
-        // Clear form fields after successful submission for new coupons
         if (!initialData) {
             form.reset({
                 name: "",
                 code: "",
                 description: "",
-                type: "PERCENTAGE_DISCOUNT", // Or a sensible default
+                type: "PERCENTAGE_DISCOUNT", 
                 value: 0,
                 startDate: "",
                 endDate: "",
@@ -141,7 +148,7 @@ const handleSubmit = (data: FormValues) => {
                 getQuantity: 0,
                 giftProductId: "",
             });
-             setStep(0); // Reset to the first step
+             setStep(0); 
         }
     };
 
@@ -189,7 +196,7 @@ const handleSubmit = (data: FormValues) => {
                                             onValueChange={field.onChange}
                                         >
                                             <FormControl>
-                                                <SelectTrigger className="text-white">
+                                                <SelectTrigger className="!bg-transparent border-2 !border-gray-300">
                                                     <SelectValue placeholder="Select coupon type" />
                                                 </SelectTrigger>
                                             </FormControl>

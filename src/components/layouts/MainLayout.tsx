@@ -10,7 +10,7 @@ const MainLayout: React.FC = () => {
       <SidebarNav />
       <div className="flex flex-1 flex-col ">
         <Header />
-        <main className="flex-1 p-4 lg:p-6 shadow-xl backdrop:backdrop-blur-3xl">
+        <main className="md:p-5 lg:p-6 shadow-xl backdrop:backdrop-blur-3xl">
           <Outlet />
         </main>
       </div>

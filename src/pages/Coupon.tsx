@@ -89,51 +89,54 @@ const Coupon: React.FC = () => {
 
     return (
         <div className={`p-4 ${isFormDialogOpen || isDeleteDialogOpen ? 'filter blur-sm' : ''}`}>
-            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Coupon Management</h1>
+            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Coupon Management</div>
 
-            <Button onClick={handleAddCoupon} className="mb-4">
+            <Button onClick={handleAddCoupon} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] text-white">
                 Add New Coupon
             </Button>
 
-            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Code</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Value</TableHead>
-                        <TableHead>Start Date</TableHead>
-                        <TableHead>End Date</TableHead>
-                        <TableHead>Active</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {coupons.slice().reverse().map((coupon) => (
-                        <TableRow key={coupon._id}>
-                            <TableCell>{coupon.name}</TableCell>
-                            <TableCell>{coupon.code}</TableCell>
-                            <TableCell>{coupon.type}</TableCell>
-                            <TableCell>{coupon.value}</TableCell>
-                            <TableCell>{new Date(coupon.startDate).toLocaleDateString()}</TableCell>
-                            <TableCell>{new Date(coupon.endDate).toLocaleDateString()}</TableCell>
-                            <TableCell>{coupon.isActive ? "Yes" : "No"}</TableCell>
-                            <TableCell>
-                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditCoupon(coupon)}>
-                                    Edit
-                                </Button>
-                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCoupon(coupon)}>
-                                    Delete
-                                </Button>
-                            </TableCell>
+            <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
+                <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Code</TableHead>
+                            <TableHead>Type</TableHead>
+                            <TableHead>Value</TableHead>
+                            <TableHead>Start Date</TableHead>
+                            <TableHead>End Date</TableHead>
+                            <TableHead>Active</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {coupons.slice().reverse().map((coupon) => (
+                            <TableRow key={coupon._id}>
+                                <TableCell>{coupon.name}</TableCell>
+                                <TableCell>{coupon.code}</TableCell>
+                                <TableCell>{coupon.type}</TableCell>
+                                <TableCell>{coupon.value}</TableCell>
+                                <TableCell>{new Date(coupon.startDate).toLocaleDateString()}</TableCell>
+                                <TableCell>{new Date(coupon.endDate).toLocaleDateString()}</TableCell>
+                                <TableCell>{coupon.isActive ? "Yes" : "No"}</TableCell>
+                                <TableCell>
+                                    <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0" size="sm" onClick={() => handleEditCoupon(coupon)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0" onClick={() => handleDeleteCoupon(coupon)}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            
 
             {/* Coupon Form Dialog (Add/Edit) */}
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent className="max-w-3xl bg-white">
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>{selectedCoupon ? "Edit Coupon" : "Add New Coupon"}</DialogTitle>
                         <DialogDescription>
@@ -150,7 +153,7 @@ const Coupon: React.FC = () => {
 
             {/* Delete Coupon Dialog */}
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent className="bg-white">
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>

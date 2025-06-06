@@ -102,83 +102,89 @@ const Category: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Category Management</h1>
+            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Category Management</div>
 
-            <Button onClick={handleAddCategory} className="mb-4">
+            <Button onClick={handleAddCategory} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0">
                 Add New Category
             </Button>
 
             <h2 className="text-xl font-semibold mb-2 text-white">Parent Categories</h2>
-            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {parentCategories.slice().reverse().map((category) => (
-                        <TableRow key={category._id}>
-                            <TableCell>{category.name}</TableCell>
-                            <TableCell>{category.slug}</TableCell>
-                            <TableCell>{category.description}</TableCell>
-                            <TableCell>
-                                {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover" />}
-                            </TableCell>
-                            <TableCell>
-                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditCategory(category)}>
-                                    Edit
-                                </Button>
-                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCategory(category)}>
-                                    Delete
-                                </Button>
-                            </TableCell>
+            <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
+                <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Slug</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead>Image</TableHead>
+                            <TableHead>Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {parentCategories.slice().reverse().map((category) => (
+                            <TableRow key={category._id}>
+                                <TableCell>{category.name}</TableCell>
+                                <TableCell>{category.slug}</TableCell>
+                                <TableCell>{category.description}</TableCell>
+                                <TableCell>
+                                    {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover" />}
+                                </TableCell>
+                                <TableCell>
+                                    <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0" size="sm" onClick={() => handleEditCategory(category)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0" onClick={() => handleDeleteCategory(category)}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            
 
             <h2 className="text-xl font-semibold text-white mt-8 mb-2">Child Categories</h2>
-            <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Slug</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Image</TableHead>
-                        <TableHead>Parent</TableHead> 
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {childCategories.slice().reverse().map((category) => (
-                        <TableRow key={category._id}>
-                            <TableCell>{category.name}</TableCell>
-                            <TableCell>{category.slug}</TableCell>
-                            <TableCell>{category.description}</TableCell>
-                            <TableCell>
-                                {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover" />}
-                            </TableCell>
-                            <TableCell>{category.parent ? category.parent.name : 'N/A'}</TableCell> 
-                            <TableCell>
-                                <Button variant="outline" className="text-white" size="sm" onClick={() => handleEditCategory(category)}>
-                                    Edit
-                                </Button>
-                                <Button variant="destructive" size="sm" className="ml-2" onClick={() => handleDeleteCategory(category)}>
-                                    Delete
-                                </Button>
-                            </TableCell>
+            <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto"> 
+                <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Slug</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead>Image</TableHead>
+                            <TableHead>Parent</TableHead> 
+                            <TableHead>Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {childCategories.slice().reverse().map((category) => (
+                            <TableRow key={category._id}>
+                                <TableCell>{category.name}</TableCell>
+                                <TableCell>{category.slug}</TableCell>
+                                <TableCell>{category.description}</TableCell>
+                                <TableCell>
+                                    {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover" />}
+                                </TableCell>
+                                <TableCell>{category.parent ? category.parent.name : 'N/A'}</TableCell> 
+                                <TableCell>
+                                    <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]" size="sm" onClick={() => handleEditCategory(category)}>
+                                        Edit
+                                    </Button>
+                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)]" onClick={() => handleDeleteCategory(category)}>
+                                        Delete
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
+            
 
 
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent>
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>{selectedCategory ? "Edit Category" : "Add New Category"}</DialogTitle>
                         <DialogDescription>
@@ -194,7 +200,7 @@ const Category: React.FC = () => {
             </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent>
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>

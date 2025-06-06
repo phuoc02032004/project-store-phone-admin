@@ -160,3 +160,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.hide-shadcn-dialog-close > button[aria-label="Close"] {
+  display: none !important;
+}

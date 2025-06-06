@@ -108,7 +108,7 @@ const Reviews = () => {
             />
 
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
                     <DialogHeader>
                         <DialogTitle>{currentReview ? "Edit Review" : "Add Review"}</DialogTitle>
                         <DialogDescription>

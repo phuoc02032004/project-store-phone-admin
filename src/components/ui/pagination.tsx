@@ -38,9 +38,10 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 }
 
 type PaginationLinkProps = {
-  isActive?: boolean
+  isActive?: boolean;
+  disabled?: boolean;
 } & Pick<React.ComponentProps<typeof Button>, "size"> &
-  React.ComponentProps<"a">
+  React.ComponentProps<"a">;
 
 function PaginationLink({
   className,
@@ -67,6 +68,7 @@ function PaginationLink({
 
 function PaginationPrevious({
   className,
+  disabled,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
@@ -74,16 +76,18 @@ function PaginationPrevious({
       aria-label="Go to previous page"
       size="default"
       className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
+      disabled={disabled}
       {...props}
     >
       <ChevronLeftIcon />
       <span className="hidden sm:block">Previous</span>
     </PaginationLink>
-  )
+  );
 }
 
 function PaginationNext({
   className,
+  disabled,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
@@ -91,12 +95,13 @@ function PaginationNext({
       aria-label="Go to next page"
       size="default"
       className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
+      disabled={disabled}
       {...props}
     >
       <span className="hidden sm:block">Next</span>
       <ChevronRightIcon />
     </PaginationLink>
-  )
+  );
 }
 
 function PaginationEllipsis({
