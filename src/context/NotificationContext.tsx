@@ -3,8 +3,7 @@ import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { getmyNotifications, markNotificationAsRead as apiMarkNotificationAsRead } from '@/api/notify';
 import type { Notify } from '@/types/Notify';
-import { io, Socket } from 'socket.io-client';
-import { SOCKET_IO_URL } from '@/constants';
+
 
 interface NotificationContextType {
   notifications: Notify[];
@@ -34,7 +33,6 @@ interface NotificationProviderProps {
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
   const [notifications, setNotifications] = useState<Notify[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
-  const socketRef = useRef<Socket | null>(null);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -91,49 +89,6 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
   useEffect(() => {
   }, [unreadCount]);
-
-  useEffect(() => {
-    if (!socketRef.current) {
-      const socket = io(SOCKET_IO_URL, {
-        transports: ['websocket'],
-      });
-
-      socket.on('connect', () => {
-        console.log('Connected to Socket.IO server');
-      });
-
-      socket.on('newNotification', (newNotification: Notify) => {
-        console.log('New notification received:', newNotification);
-        
-        const notificationWithReadStatus = { ...newNotification, read: false };
-        
-        setNotifications(prev => [notificationWithReadStatus, ...prev]);
-        setUnreadCount(prev => prev + 1);
-        
-        toast.info(newNotification.title, {
-          description: newNotification.body,
-          duration: 5000,
-        });
-      });
-
-      socket.on('disconnect', () => {
-        console.log('Disconnected from Socket.IO server');
-      });
-
-      socket.on('connect_error', (err) => {
-        console.error('Socket.IO connection error:', err);
-      });
-
-      socketRef.current = socket;
-    }
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-        socketRef.current = null;
-      }
-    };
-  }, []);
 
   const showSuccess = useCallback((message: string) => {
     toast.success(message);
