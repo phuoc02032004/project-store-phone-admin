@@ -20,7 +20,7 @@ import { PlusCircle } from "lucide-react";
 import { toast } from "sonner"
 
 
-const Reviews = () => {
+const Reviews: React.FC = () => {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

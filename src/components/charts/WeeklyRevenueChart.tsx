@@ -44,7 +44,7 @@ const WeeklyRevenueChart: React.FC<WeeklyRevenueChartProps> = ({ data }) => {
     xaxis: {
       type: 'datetime' as 'datetime',
       labels: {
-        formatter: function(value: string, timestamp?: number) {
+        formatter: function(_value: string, timestamp?: number) {
           return timestamp ? new Date(timestamp).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short' }) : '';
         }
       },

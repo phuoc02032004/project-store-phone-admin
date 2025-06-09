@@ -6,8 +6,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import NotificationTable from "@/components/notification/NotificationTable";
 
 const Header: React.FC = () => {
-  const { unreadCount, fetchNotifications, markAllNotificationsAsRead } = useNotifications();
-  const [isDesktopNotificationOpen, setIsDesktopNotificationOpen] = useState(false);
+  const { unreadCount, fetchNotifications } = useNotifications();
+  const [, setIsDesktopNotificationOpen] = useState(false);
   
   const handleOpenNotification = () => {
     fetchNotifications();

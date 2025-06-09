@@ -15,7 +15,6 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Coupon as CouponType } from "@/types/Coupon";
 import { getCoupons, createCoupon, updateCoupon, deleteCoupon } from "@/api/coupon";

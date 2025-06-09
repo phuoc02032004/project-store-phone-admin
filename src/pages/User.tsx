@@ -19,7 +19,6 @@ import {
 import type { User as UserType } from "@/types/User";
 import { getUsers, promoteUserToAdmin, deleteUser } from "@/api/user";
 import { toast } from "sonner";
-import { X } from "lucide-react";
 
 const User: React.FC = () => {
     const [users, setUsers] = useState<UserType[]>([]);
