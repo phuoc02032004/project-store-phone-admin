@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { toast } from 'sonner';
 import { getmyNotifications, markNotificationAsRead as apiMarkNotificationAsRead } from '@/api/notify';
