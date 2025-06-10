@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 
 const Header: React.FC = () => {
   const { unreadCount, fetchNotifications } = useNotifications();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [, setIsMobileMenuOpen] = useState(false);
   const [, setIsDesktopNotificationOpen] = useState(false);
   
   const handleOpenNotification = () => {
