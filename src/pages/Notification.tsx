@@ -98,71 +98,90 @@ const Notifications: React.FC = () => {
     const endIndex = startIndex + itemsPerPage;
     const currentNotifications = notifications.slice(startIndex, endIndex);
 
-    const handlePageChange = (page: number) => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-        }
-    };
+    const pageRange = 2;
 
     const renderPaginationItems = () => {
-        const pageItems: (number | 'ellipsis')[] = [];
-        const maxPageLinks = 5; 
-        const pageWindow = 2; 
+        const items = [];
+        const startPage = Math.max(1, currentPage - pageRange);
+        const endPage = Math.min(totalPages, currentPage + pageRange);
 
-        if (totalPages === 0) {
-            return [];
-        }
-
-        if (totalPages <= maxPageLinks) {
-            for (let i = 1; i <= totalPages; i++) {
-                pageItems.push(i);
-            }
-        } else {
-            pageItems.push(1);
-
-            let rangeStart = Math.max(2, currentPage - pageWindow);
-            let rangeEnd = Math.min(totalPages - 1, currentPage + pageWindow);
-
-            if (currentPage - 1 <= pageWindow) { 
-                rangeEnd = Math.min(totalPages - 1, maxPageLinks -1 ); 
-            } else if (totalPages - currentPage <= pageWindow) {
-                rangeStart = Math.max(2, totalPages - (maxPageLinks -1));
-            }
-
-            if (rangeStart > 2) {
-                pageItems.push('ellipsis');
-            }
-
-            for (let i = rangeStart; i <= rangeEnd; i++) {
-                pageItems.push(i);
-            }
-
-            if (rangeEnd < totalPages - 1) {
-                pageItems.push('ellipsis');
-            }
-
-            if (totalPages > 1) { 
-                 pageItems.push(totalPages);
+        if (startPage > 1) {
+            items.push(
+                <PaginationItem key={1}>
+                    <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(1);
+                        }}
+                        className="!text-white"
+                    >
+                        1
+                    </PaginationLink>
+                </PaginationItem>
+            );
+            if (startPage > 2) {
+                items.push(
+                    <PaginationEllipsis key="ellipsis-start" className="!text-white" />
+                );
             }
         }
 
-        const finalItems: (number | 'ellipsis')[] = [];
-        if (pageItems.length > 0) {
-            finalItems.push(pageItems[0]);
-            for (let i = 1; i < pageItems.length; i++) {
-                if (!(pageItems[i] === 'ellipsis' && pageItems[i-1] === 'ellipsis') && pageItems[i] !== pageItems[i-1]) {
-                    finalItems.push(pageItems[i]);
-                }
-            }
+        for (let page = startPage; page <= endPage; page++) {
+            items.push(
+                <PaginationItem key={page}>
+                    <PaginationLink
+                        href="#"
+                        isActive={page === currentPage}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(page);
+                        }}
+                        className={`!text-white ${
+                            page === currentPage
+                                ? "bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)] backdrop-blur-[10px] rounded-[20px] border border-[rgba(255,255,255,0.18)] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+                                : ""
+                        }`}
+                    >
+                        {page}
+                    </PaginationLink>
+                </PaginationItem>
+            );
         }
 
-        return finalItems;
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                items.push(
+                    <PaginationEllipsis key="ellipsis-end" className="!text-white" />
+                );
+            }
+            items.push(
+                <PaginationItem key={totalPages}>
+                    <PaginationLink
+                        href="#"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(totalPages);
+                        }}
+                        className="!text-white"
+                    >
+                        {totalPages}
+                    </PaginationLink>
+                </PaginationItem>
+            );
+        }
+
+        return items;
     };
 
 
     return (
         <div className="p-4">
-            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Notification Management</h1>
+            <h1 className="text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 rounded-lg
+            bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]
+            backdrop-blur-[10px]
+            border border-[rgba(255,255,255,0.18)]
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">Notification Management</h1>
 
             <Button onClick={handleAddNotification} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] text-white">
                 Add New Notification
@@ -205,34 +224,34 @@ const Notifications: React.FC = () => {
             </Table>
 
             {totalPages > 1 && (
-                <Pagination className="mt-4">
-                    <PaginationContent>
+                <Pagination className="mt-4 bg-transparent">
+                    <PaginationContent
+                        className="p-2 rounded-2xl
+                            bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]
+                            backdrop-blur-[10px]
+                            border border-[rgba(255,255,255,0.18)]
+                            shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]
+                            "
+                    >
                         <PaginationItem>
-                            <PaginationPrevious 
-                                onClick={() => handlePageChange(currentPage - 1)} 
-                                disabled={currentPage === 1} 
-                                style={{ cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+                            <PaginationPrevious
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setCurrentPage((prev) => Math.max(1, prev - 1));
+                                }}
+                                className="!text-white"
                             />
                         </PaginationItem>
-                        {renderPaginationItems().map((item, index) => (
-                            <PaginationItem key={index}>
-                                {item === 'ellipsis' ? (
-                                    <PaginationEllipsis />
-                                ) : (
-                                    <PaginationLink
-                                        isActive={currentPage === item}
-                                        onClick={() => handlePageChange(item as number)}
-                                    >
-                                        {item}
-                                    </PaginationLink>
-                                )}
-                            </PaginationItem>
-                        ))}
+                        {renderPaginationItems()}
                         <PaginationItem>
-                            <PaginationNext 
-                                onClick={() => handlePageChange(currentPage + 1)} 
-                                disabled={currentPage === totalPages} 
-                                style={{ cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                                }}
+                                className="!text-white"
                             />
                         </PaginationItem>
                     </PaginationContent>

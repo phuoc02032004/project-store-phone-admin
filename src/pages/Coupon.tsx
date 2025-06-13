@@ -88,7 +88,11 @@ const Coupon: React.FC = () => {
 
     return (
         <div className={`p-4 ${isFormDialogOpen || isDeleteDialogOpen ? 'filter blur-sm' : ''}`}>
-            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Coupon Management</div>
+            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 rounded-lg
+            bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]
+            backdrop-blur-[10px]
+            border border-[rgba(255,255,255,0.18)]
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">Coupon Management</div>
 
             <Button onClick={handleAddCoupon} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] text-white">
                 Add New Coupon

@@ -103,18 +103,39 @@ const Order: React.FC = () => {
             if (startPage > 1) {
                 items.push(
                     <PaginationItem key={1}>
-                        <PaginationLink href="#" onClick={() => setCurrentPage(1)} className="text-black">1</PaginationLink>
+                        <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage(1);
+                            }}
+                            className="!text-white"
+                        >
+                            1
+                        </PaginationLink>
                     </PaginationItem>
                 );
                 if (startPage > 2) {
-                    items.push(<PaginationEllipsis key="ellipsis-start" className="text-black" />);
+                    items.push(<PaginationEllipsis key="ellipsis-start" className="!text-white" />);
                 }
             }
     
             for (let page = startPage; page <= endPage; page++) {
                 items.push(
                     <PaginationItem key={page}>
-                        <PaginationLink href="#" isActive={page === currentPage} onClick={() => setCurrentPage(page)} className="text-black">
+                        <PaginationLink
+                            href="#"
+                            isActive={page === currentPage}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage(page);
+                            }}
+                            className={`!text-white ${
+                                page === currentPage
+                                    ? "bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)] backdrop-blur-[10px] rounded-[20px] border border-[rgba(255,255,255,0.18)] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+                                    : ""
+                            }`}
+                        >
                             {page}
                         </PaginationLink>
                     </PaginationItem>
@@ -123,11 +144,20 @@ const Order: React.FC = () => {
     
             if (endPage < totalPages) {
                 if (endPage < totalPages - 1) {
-                    items.push(<PaginationEllipsis key="ellipsis-end" className="text-black" />);
+                    items.push(<PaginationEllipsis key="ellipsis-end" className="!text-white" />);
                 }
                 items.push(
                     <PaginationItem key={totalPages}>
-                        <PaginationLink href="#" onClick={() => setCurrentPage(totalPages)} className="text-black">{totalPages}</PaginationLink>
+                        <PaginationLink
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage(totalPages);
+                            }}
+                            className="!text-white"
+                        >
+                            {totalPages}
+                        </PaginationLink>
                     </PaginationItem>
                 );
             }
@@ -137,7 +167,11 @@ const Order: React.FC = () => {
 
     return (
         <div className="p-4">
-            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Order Management</div>
+            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20  rounded-lg
+            bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]
+            backdrop-blur-[10px]
+            border border-[rgba(255,255,255,0.18)]
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">Order Management</div>
 
             <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
                 <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
@@ -171,17 +205,38 @@ const Order: React.FC = () => {
                 </Table>
             </div>
 
-            <Pagination className="mt-4  bg-transparent">
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} className="" />
-                                </PaginationItem>
-                                {renderPaginationItems()}
-                                <PaginationItem>
-                                    <PaginationNext href="#" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
+            <Pagination className="mt-4 bg-transparent">
+                <PaginationContent
+                    className="p-2 rounded-2xl
+                        bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]
+                        backdrop-blur-[10px]
+                        border border-[rgba(255,255,255,0.18)]
+                        shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]
+                        "
+                >
+                    <PaginationItem>
+                        <PaginationPrevious
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage((prev) => Math.max(1, prev - 1));
+                            }}
+                            className="!text-white"
+                        />
+                    </PaginationItem>
+                    {renderPaginationItems()}
+                    <PaginationItem>
+                        <PaginationNext
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage((prev) => Math.min(totalPages, prev + 1));
+                            }}
+                            className="!text-white"
+                        />
+                    </PaginationItem>
+                </PaginationContent>
+            </Pagination>
                         
             <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
                 <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
