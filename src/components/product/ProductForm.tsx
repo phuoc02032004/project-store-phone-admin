@@ -127,7 +127,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSubmit, onCanc
                                 <FormLabel className="text-gray-700 font-medium">Category</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
-                                        <SelectTrigger className="text-white border-gray-300 !bg-white">
+                                        <SelectTrigger className=" border-gray-300 !bg-white">
                                             <SelectValue placeholder="Select a category" />
                                         </SelectTrigger>
                                     </FormControl>

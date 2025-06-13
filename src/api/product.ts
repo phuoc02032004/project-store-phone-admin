@@ -20,11 +20,12 @@ productApi.interceptors.request.use(
     }
 );
 
-const getProducts = async () => {
+const getProducts = async (params?: { isNewArrival?: boolean; isBestSeller?: boolean }): Promise<Product[]> => {
     try {
-        const response = await productApi.get<Product[]>("/products");
+        const response = await productApi.get('/products', { params });
         return response.data;
     } catch (error) {
+        console.error('Error fetching products:', error);
         throw error;
     }
 };

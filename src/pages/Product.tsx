@@ -1,235 +1,233 @@
 import React, { useEffect, useState } from "react";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import type { Product as ProductType } from "@/types/Products";
-import { getProducts, addProduct, updateProduct, deleteProduct } from "@/api/product";
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "@/api/product";
 import ProductForm from "@/components/product/ProductForm";
-import { toast } from "sonner"
-
+import ProductTable from "@/components/product/ProductTable";
+import ProductPagination from "@/components/product/ProductPagination";
+import { toast } from "sonner";
 
 const Product: React.FC = () => {
-    const [products, setProducts] = useState<ProductType[]>([]);
-    const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
-    const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [isNewProducts, setIsNewProducts] = useState<ProductType[]>([]);
+  const [isBestSeller, setIsBestSeller] = useState<ProductType[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(
+    null
+  );
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [currentPageAllProducts, setCurrentPageAllProducts] = useState(1);
+  const [currentPageNewProducts, setCurrentPageNewProducts] = useState(1);
+  const [currentPageBestSeller, setCurrentPageBestSeller] = useState(1);
+  const [itemsPerPage] = useState(10);
 
-    useEffect(() => {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data.slice().reverse().slice());
+      const newArrivals = await getProducts({ isNewArrival: true });
+      const bestSellers = await getProducts({ isBestSeller: true });
+      console.log("new", newArrivals);
+      setIsNewProducts(newArrivals.slice().reverse().slice());
+      setIsBestSeller(bestSellers.slice().reverse().slice());
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  const handleAddProduct = () => {
+    setSelectedProduct(null);
+    setIsFormDialogOpen(true);
+    toast("Ready to add a new product!");
+  };
+
+  const handleEditProduct = (product: ProductType) => {
+    setSelectedProduct(product);
+    setIsFormDialogOpen(true);
+  };
+
+  const handleDeleteProduct = (product: ProductType) => {
+    setSelectedProduct(product);
+    setIsDeleteDialogOpen(true);
+    toast.error("Are you sure you want to delete this product?");
+  };
+
+  const handleSaveProduct = async (formData: FormData) => {
+    try {
+      if (selectedProduct) {
+        await updateProduct(selectedProduct._id, formData);
+      } else {
+        await addProduct(formData);
+      }
+      fetchProducts();
+      setIsFormDialogOpen(false);
+      toast(
+        `${
+          selectedProduct
+            ? "Product updated successfully."
+            : "Product added successfully."
+        }`
+      );
+    } catch (error) {
+      console.error("Error saving product:", error);
+      toast(
+        `Failed to save product. ${error instanceof Error ? error.message : ""}`
+      );
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedProduct) {
+      try {
+        await deleteProduct(selectedProduct._id);
         fetchProducts();
-    }, []);
+        setIsDeleteDialogOpen(false);
+        toast("Product deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast(
+          `Failed to delete product. ${
+            error instanceof Error ? error.message : ""
+          }`
+        );
+      }
+    }
+  };
 
-    const fetchProducts = async () => {
-        try {
-            const data = await getProducts();
-            setProducts(data);
-        } catch (error) {
-            console.error("Error fetching products:", error);
-        }
-    };
+  const totalPagesAllProducts = Math.ceil(products.length / itemsPerPage);
+  const totalPagesNewProducts = Math.ceil(isNewProducts.length / itemsPerPage);
+  const totalPagesBestSeller = Math.ceil(isBestSeller.length / itemsPerPage);
 
-    const handleAddProduct = () => {
-        setSelectedProduct(null);
-        setIsFormDialogOpen(true);
-        toast("Ready to add a new product!");
-    };
+  return (
+    <div className="p-2 sm:p-4">
+      <div
+        className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20
+            bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]
+            backdrop-blur-[10px]
+            rounded-[20px]
+            border border-[rgba(255,255,255,0.18)]
+            shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
+      >
+        Product Management
+      </div>
 
-    const handleEditProduct = (product: ProductType) => {
-        setSelectedProduct(product);
-        setIsFormDialogOpen(true);
-    };
+      <Button
+        onClick={handleAddProduct}
+        className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0"
+      >
+        Add New Product
+      </Button>
 
-    const handleDeleteProduct = (product: ProductType) => {
-        setSelectedProduct(product);
-        setIsDeleteDialogOpen(true);
-        toast.error("Are you sure you want to delete this product?");
-    };
+      <div className="text-lg sm:text-xl font-semibold text-white mb-2 mt-6">
+        All Products
+      </div>
+      <ProductTable
+        products={products}
+        currentPage={currentPageAllProducts}
+        itemsPerPage={itemsPerPage}
+        handleEditProduct={handleEditProduct}
+        handleDeleteProduct={handleDeleteProduct}
+      />
+      <ProductPagination
+        currentPage={currentPageAllProducts}
+        totalPages={totalPagesAllProducts}
+        setCurrentPage={setCurrentPageAllProducts}
+      />
 
-    const handleSaveProduct = async (formData: FormData) => {
-        try {
-            if (selectedProduct) {
-                await updateProduct(selectedProduct._id, formData);
-            } else {
-                await addProduct(formData);
-            }
-            fetchProducts();
-            setIsFormDialogOpen(false);
-            toast(`${selectedProduct ? "Product updated successfully." : "Product added successfully."}`);
-        } catch (error) {
-            console.error("Error saving product:", error);
-            toast(`Failed to save product. ${error instanceof Error ? error.message : ''}`);
-        }
-    };
+      <div className="text-lg sm:text-xl font-semibold text-white mb-2 mt-6">
+        New Arrivals
+      </div>
+      <ProductTable
+        products={isNewProducts}
+        currentPage={currentPageNewProducts}
+        itemsPerPage={itemsPerPage}
+        handleEditProduct={handleEditProduct}
+        handleDeleteProduct={handleDeleteProduct}
+      />
+      <ProductPagination
+        currentPage={currentPageNewProducts}
+        totalPages={totalPagesNewProducts}
+        setCurrentPage={setCurrentPageNewProducts}
+      />
 
-    const handleConfirmDelete = async () => {
-        if (selectedProduct) {
-            try {
-                await deleteProduct(selectedProduct._id);
-                fetchProducts();
-                setIsDeleteDialogOpen(false);
-                toast("Product deleted successfully.");
-            } catch (error) {
-                console.error("Error deleting product:", error);
-                toast(`Failed to delete product. ${error instanceof Error ? error.message : ''}`);
-            }
-        }
-    };
+      <div className="text-lg sm:text-xl font-semibold text-white mb-2 mt-6">
+        Best Sellers
+      </div>
+      <ProductTable
+        products={isBestSeller}
+        currentPage={currentPageBestSeller}
+        itemsPerPage={itemsPerPage}
+        handleEditProduct={handleEditProduct}
+        handleDeleteProduct={handleDeleteProduct}
+      />
+      <ProductPagination
+        currentPage={currentPageBestSeller}
+        totalPages={totalPagesBestSeller}
+        setCurrentPage={setCurrentPageBestSeller}
+      />
 
-    const totalPages = Math.ceil(products.length / itemsPerPage);
-    const pageRange = 2; // Number of pages to show around the current page
+      <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+        <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedProduct ? "Edit Product" : "Add New Product"}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedProduct
+                ? "Make changes to the product details here."
+                : "Fill in the details for the new product."}
+            </DialogDescription>
+          </DialogHeader>
+          <ProductForm
+            initialData={selectedProduct}
+            onSubmit={handleSaveProduct}
+            onCancel={() => setIsFormDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
-    const renderPaginationItems = () => {
-        const items = [];
-        const startPage = Math.max(1, currentPage - pageRange);
-        const endPage = Math.min(totalPages, currentPage + pageRange);
-
-        if (startPage > 1) {
-            items.push(
-                <PaginationItem key={1}>
-                    <PaginationLink href="#" onClick={() => setCurrentPage(1)} className="text-white">1</PaginationLink>
-                </PaginationItem>
-            );
-            if (startPage > 2) {
-                items.push(<PaginationEllipsis key="ellipsis-start" className="text-black" />);
-            }
-        }
-
-        for (let page = startPage; page <= endPage; page++) {
-            items.push(
-                <PaginationItem key={page}>
-                    <PaginationLink href="#" isActive={page === currentPage} onClick={() => setCurrentPage(page)} className="text-black">
-                        {page}
-                    </PaginationLink>
-                </PaginationItem>
-            );
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                items.push(<PaginationEllipsis key="ellipsis-end" className="text-black" />);
-            }
-            items.push(
-                <PaginationItem key={totalPages}>
-                    <PaginationLink href="#" onClick={() => setCurrentPage(totalPages)} className="text-black">{totalPages}</PaginationLink>
-                </PaginationItem>
-            );
-        }
-
-        return items;
-    };
-
-    return (
-        <div className="p-2 sm:p-4">
-            <div className="text-xl sm:text-2xl text-center font-bold text-white mb-4 p-2 bg-white/20 backdrop-blur-3xl shadow-2xl rounded-lg">Product Management</div>
-
-            <Button onClick={handleAddProduct} className="mb-4 bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0">
-                Add New Product
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
+          <DialogHeader>
+            <DialogTitle>Are you absolutely sure?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete the
+              product.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
             </Button>
-
-            <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
-                <Table className="bg-white sm:p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Name</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead>Image</TableHead>
-                            <TableHead>Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).reverse().map((product) => (
-                            <TableRow key={product._id}>
-                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">{product.name}</TableCell>
-                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">{product.description}</TableCell>
-                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">
-                                    <img src={product.image} alt={product.name} className="w-16 h-16 object-cover" />
-                                </TableCell>
-                                <TableCell className="py-2 px-2 sm:py-3 sm:px-4">
-                                    <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0 text-xs py-1 px-2" size="sm" onClick={() => handleEditProduct(product)}>
-                                        Edit
-                                    </Button>
-                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0 text-xs py-1 px-2" onClick={() => handleDeleteProduct(product)}>
-                                        Delete
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </div>
-
-            <Pagination className="mt-4  bg-transparent">
-                <PaginationContent>
-                    <PaginationItem>
-                        <PaginationPrevious href="#" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} className="" />
-                    </PaginationItem>
-                    {renderPaginationItems()}
-                    <PaginationItem>
-                        <PaginationNext href="#" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} />
-                    </PaginationItem>
-                </PaginationContent>
-            </Pagination>
-
-            <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
-                    <DialogHeader>
-                        <DialogTitle>{selectedProduct ? "Edit Product" : "Add New Product"}</DialogTitle>
-                        <DialogDescription>
-                            {selectedProduct ? "Make changes to the product details here." : "Fill in the details for the new product."}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <ProductForm
-                        initialData={selectedProduct}
-                        onSubmit={handleSaveProduct}
-                        onCancel={() => setIsFormDialogOpen(false)}
-                    />
-                </DialogContent>
-            </Dialog>
-
-            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <DialogContent className="[&>button]:text-white [&>button]:bg-[linear-gradient(to_right,#264D59,#041B2D)] [&>button]:!border-0">
-                    <DialogHeader>
-                        <DialogTitle>Are you absolutely sure?</DialogTitle>
-                        <DialogDescription>
-                            This action cannot be undone. This will permanently delete the product.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" className="text-white bg-[linear-gradient(to_right,#264D59,#041B2D)]" onClick={() => setIsDeleteDialogOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button variant="destructive" onClick={handleConfirmDelete}>
-                            Delete
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        </div>
-    );
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 };
 
 export default Product;
