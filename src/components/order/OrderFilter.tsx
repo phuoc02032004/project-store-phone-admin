@@ -34,6 +34,7 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ onFilter }) => {
     setStartDate(undefined);
     setEndDate(undefined);
     onFilter({});
+    onFilter({ search, status, startDate, endDate });
   };
 
   return (

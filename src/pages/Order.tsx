@@ -54,11 +54,11 @@ const Order: React.FC = () => {
 
     useEffect(() => {
         fetchOrders();
-    }, []); // Fetch orders only once on component mount
+    }, []); 
 
     useEffect(() => {
         applyFilters();
-    }, [orders, filters]); // Re-apply filters when orders or filters change
+    }, [orders, filters]); 
 
     const fetchOrders = async () => {
         try {
@@ -99,7 +99,7 @@ const Order: React.FC = () => {
         }
 
         setFilteredOrders(tempOrders);
-        setCurrentPage(1); // Reset to first page on filter change
+        setCurrentPage(1); 
     };
 
     const handleFilterChange = (newFilters: {
@@ -240,26 +240,31 @@ const Order: React.FC = () => {
                             <TableHead>User</TableHead>
                             <TableHead>Total Amount</TableHead>
                             <TableHead>Status</TableHead>
+                            <TableHead>Created At</TableHead>
                             <TableHead>Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
-                            <TableRow key={order._id}>
-                                <TableCell>{order._id}</TableCell>
-                                <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
-                                <TableCell>{order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</TableCell>
-                                <TableCell>{order.orderStatus}</TableCell>
-                                <TableCell>
-                                    <Button variant="outline" className="!bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0 text-white" size="sm" onClick={() => handleViewDetails(order)}>
-                                        View Details
-                                    </Button>
-                                    <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0 text-white" onClick={() => handleDeleteOrder(order)}>
-                                        Delete
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => {
+                            console.log("Order createdAt:", order.createdAt);
+                            return (
+                                <TableRow key={order._id}>
+                                    <TableCell>{order._id}</TableCell>
+                                    <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
+                                    <TableCell>{order.totalAmount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</TableCell>
+                                    <TableCell>{order.orderStatus}</TableCell>
+                                    <TableCell>{new Date(order.createdAt).toLocaleString()}</TableCell>
+                                    <TableCell>
+                                        <Button variant="outline" className="!bg-[linear-gradient(to_right,#264D59,#041B2D)] !border-0 text-white" size="sm" onClick={() => handleViewDetails(order)}>
+                                            View Details
+                                        </Button>
+                                        <Button variant="destructive" size="sm" className="ml-2 bg-[linear-gradient(to_right,#041B2D,#264D59)] !border-0 text-white" onClick={() => handleDeleteOrder(order)}>
+                                            Delete
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </div>
