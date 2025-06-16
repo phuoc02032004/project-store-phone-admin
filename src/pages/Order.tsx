@@ -28,22 +28,37 @@ import {
 import type { Order as OrderType } from "@/types/Order";
 import { getOrders, updateOrderStatus, deleteOrder } from "@/api/order";
 import OrderForm from "@/components/order/OrderForm";
+import OrderFilter from "@/components/order/OrderFilter";
 import { toast } from "sonner"
 
 const Order: React.FC = () => {
     const [orders, setOrders] = useState<OrderType[]>([]);
+    const [filteredOrders, setFilteredOrders] = useState<OrderType[]>([]);
     const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
     const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [isViewMode, setIsViewMode] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
-    
-    
+    const [filters, setFilters] = useState<{
+        search: string;
+        status: string;
+        startDate: Date | undefined;
+        endDate: Date | undefined;
+    }>({
+        search: "",
+        status: "all",
+        startDate: undefined,
+        endDate: undefined,
+    });
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, []); // Fetch orders only once on component mount
+
+    useEffect(() => {
+        applyFilters();
+    }, [orders, filters]); // Re-apply filters when orders or filters change
 
     const fetchOrders = async () => {
         try {
@@ -52,6 +67,48 @@ const Order: React.FC = () => {
         } catch (error) {
             console.error("Error fetching orders:", error);
         }
+    };
+
+    const applyFilters = () => {
+        let tempOrders = [...orders];
+
+        if (filters.search) {
+            tempOrders = tempOrders.filter(
+                (order) =>
+                    order._id.toLowerCase().includes(filters.search.toLowerCase()) ||
+                    (order.user && (order.user as any).email && (order.user as any).email.toLowerCase().includes(filters.search.toLowerCase()))
+            );
+        }
+
+        if (filters.status && filters.status !== "all") {
+            tempOrders = tempOrders.filter(
+                (order) => order.orderStatus && order.orderStatus.toLowerCase() === filters.status.toLowerCase()
+            );
+        }
+
+        if (filters.startDate) {
+            tempOrders = tempOrders.filter(
+                (order) => new Date(order.createdAt) >= filters.startDate!
+            );
+        }
+
+        if (filters.endDate) {
+            tempOrders = tempOrders.filter(
+                (order) => new Date(order.createdAt) <= filters.endDate!
+            );
+        }
+
+        setFilteredOrders(tempOrders);
+        setCurrentPage(1); // Reset to first page on filter change
+    };
+
+    const handleFilterChange = (newFilters: {
+        search?: string;
+        status?: string;
+        startDate?: Date | undefined;
+        endDate?: Date | undefined;
+    }) => {
+        setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
     };
 
     const handleViewDetails = (order: OrderType) => {
@@ -173,6 +230,8 @@ const Order: React.FC = () => {
             border border-[rgba(255,255,255,0.18)]
             shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">Order Management</div>
 
+            <OrderFilter onFilter={handleFilterChange} />
+
             <div className="overflow-x-auto sm:w-full w-[350px] rounded-lg shadow-2xl max-w-full mx-auto">
                 <Table className="bg-white p-10 backdrop-blur-3xl shadow-2xl rounded-lg">
                     <TableHeader>
@@ -185,7 +244,7 @@ const Order: React.FC = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {orders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
+                        {filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((order) => (
                             <TableRow key={order._id}>
                                 <TableCell>{order._id}</TableCell>
                                 <TableCell>{order.user ? (order.user as any).email || (order.user as any)._id : "N/A"}</TableCell>
