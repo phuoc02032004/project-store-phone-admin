@@ -33,7 +33,7 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ onFilter }) => {
     setStatus("");
     setStartDate(undefined);
     setEndDate(undefined);
-    onFilter({}); // Clear all filters
+    onFilter({});
   };
 
   return (
@@ -45,17 +45,17 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ onFilter }) => {
           placeholder="Search by Order ID or User Email"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-white/10 text-white border-white/30"
+          className="bg-transparent text-white bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]  backdrop-blur-[10px] border border-[rgba(255,255,255,0.18)] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]"
         />
       </div>
 
       <div className="flex-1 min-w-[150px]">
         <Label htmlFor="status" className="text-white">Status</Label>
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="bg-white/10 text-white border-white/30">
-            <SelectValue placeholder="Select Status" />
+          <SelectTrigger className="!bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]  backdrop-blur-[10px] border border-[rgba(255,255,255,0.18)] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-white !bg-transparent">
+            <SelectValue placeholder="Select Status"/>
           </SelectTrigger>
-          <SelectContent className="bg-gray-800 text-white">
+          <SelectContent className="!bg-gray-800 text-white">
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
             <SelectItem value="processing">Processing</SelectItem>
@@ -73,7 +73,7 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ onFilter }) => {
             <Button
               variant={"outline"}
               className={cn(
-                "w-full justify-start text-left font-normal bg-gray-900 text-white border-gray-600 shadow-sm",
+                "w-full justify-start text-left font-normal !bg-black/10 text-white bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]  backdrop-blur-[10px] border border-[rgba(255,255,255,0.18)] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]",
                 !startDate && "text-muted-foreground"
               )}
             >
@@ -101,7 +101,7 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ onFilter }) => {
             <Button
               variant={"outline"}
               className={cn(
-                "w-full justify-start text-left font-normal bg-gray-900 text-white border-gray-600 shadow-sm",
+                "w-full justify-start text-left font-normal !bg-black/10 text-white bg-gradient-to-tr from-[rgba(255,255,255,0.1)] to-[rgba(255,255,255,0)]  backdrop-blur-[10px] border border-[rgba(255,255,255,0.18)] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]",
                 !endDate && "text-muted-foreground"
               )}
             >
